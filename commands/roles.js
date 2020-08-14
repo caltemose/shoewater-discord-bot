@@ -11,20 +11,24 @@ module.exports = {
 	//const description = 'Get roles for this guild.';
 	name: 'roles',
 	description: 'Get roles for this guild.',
-	execute: (message, args) => {
-		var rolesClean = {}; //await keyv.get('roles');
-		// if (!rolesClean) rolesClean = {};
+	cooldown: 5,
+	execute: async (message, args, keyv) => {
+		var rolesClean = await keyv.get('roles');
+		console.log('rolesClean from keyv', rolesClean);
+		if (!rolesClean) rolesClean = {};
 
 		message.guild.roles.fetch()
-			.then(roles => {
+			.then(async roles => {
 				roles.cache
 					.each(role => {
 						if (role.name !== '@everyone') {
 							rolesClean[role.id] = role.name;
 						}
 					})
-				// await keyv.set('roles', rolesClean);
-				const response = getRolesString(rolesClean);
+				const rolesSet = await keyv.set('roles', rolesClean);
+				let response;
+				if (rolesSet) response = getRolesString(rolesClean);
+				else response = 'Could not set roles in keyv';
 				message.channel.send(response);
 			})
 			.catch(console.error)
