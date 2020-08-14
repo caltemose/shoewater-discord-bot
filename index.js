@@ -2,6 +2,30 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { token, prefix } = require('./config.json');
 
+//
+// data storage via Keyv
+// currently using local JSON file
+//
+/*
+const Keyv = require('keyv');
+const KeyvFile = require('keyv-file').KeyvFile;
+const path = require('path');
+
+const keyv = new Keyv({
+	store: new KeyvFile({
+		filename: path.join(__dirname, '../keyv.json'),
+		writeDelay: 100,
+		encode: JSON.stringify,
+		decode: JSON.parse,
+	})
+});
+
+keyv.on('error', err => console.error('Connection Error', err));
+*/
+//
+// initialize discord client and commands
+//
+
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
@@ -13,6 +37,10 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
+
+//
+// Discord event listeners
+//
 
 client.once('ready', () => {
 	console.log(`Logged in as ${client.user.tag}!`);
@@ -78,6 +106,10 @@ client.on('shardError', error => {
 	ECONNREFUSED - The target machine refused the connection, check your ports and firewall.
 	*/
 });
+
+//
+// login to Discord to get started
+//
 
 client.login(token);
 
