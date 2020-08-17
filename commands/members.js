@@ -32,9 +32,16 @@ module.exports = {
 		message.guild.members.fetch()
 			.then(collection => {
 				var membersByRoleId = getRoleIds(roles);
+				var members = [];
 				collection
 					.filter(user => !user.user.bot)
 					.each(user => {
+						console.log(user);
+						members.push({
+							id: user.user.id,
+							username: user.user.username,
+							roles: user._roles,
+						});
 						user._roles.forEach(userRoleId => {
 							if (userRoleId && membersByRoleId[userRoleId]) {
 								membersByRoleId[userRoleId].push({
@@ -44,9 +51,16 @@ module.exports = {
 							}
 						});
 					});
-				console.log('membersByRoleId', membersByRoleId);
+				// console.log('membersByRoleId', membersByRoleId);
 				const membersList = getSortedMembersList(membersByRoleId, roles);
-				console.log(membersList);
+				// console.log(membersList);
+				/*
+				determine best way to store members in JSON for associating PSNs
+				- this could happen in a different message
+				- need membersById object to speed up actions
+				- 
+				*/
+				// keyv.set('members', members);
 				message.channel.send(membersList);
 			})
 			.catch(console.error);
