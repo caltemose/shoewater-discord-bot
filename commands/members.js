@@ -60,7 +60,7 @@ module.exports = {
 				- need membersById object to speed up actions
 				- 
 				*/
-				// keyv.set('members', members);
+				keyv.set('members', members);
 				message.channel.send(membersList);
 			})
 			.catch(console.error);
