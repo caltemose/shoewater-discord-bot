@@ -2,6 +2,12 @@ module.exports = {
 	name: 'psn',
 	description: 'Manage PSNs of Discord users',
 	cooldown: 3,
+	usage: `
+[psn] will show you all the members who have PSNs that are different from their Discord
+[psn all] will show you all members, including ones whose psn is the same as their Discord
+[psn add DiscordName PSN] allows you to add a PSN to a Discord user. Note that the DiscordName is case-sensitive
+example:  !psn add shoewater shoewatersDifferentPSN
+	`,
 	execute: async (message, args, keyv) => {
 		const members = await keyv.get('members');
 		var psn = await keyv.get('psn');
