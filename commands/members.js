@@ -22,8 +22,14 @@ module.exports = {
 	name: 'members',
 	description: 'Get members for this guild, sorted by role.',
 	cooldown: 5,
-	execute: async (message, args, keyv) => {
-		var roles = await keyv.get('roles');
+	execute: async (message, args, keyv, prefix, guildId) => {
+		var allRoles = await keyv.get('roles');
+		var roles;
+		if (allRoles[guildId]) {
+			roles = allRoles[guildId];
+		}
+		else {
+		}
 		
 		if (!roles) {
 			message.channel.send('Could not find roles. Run the `roles` command to retrieve them before getting the members list.');
@@ -68,6 +74,7 @@ module.exports = {
 };
 
 /*
+command.execute(message, args, keyv, prefix, guildId);
 
 roles = {
 	roleId: roleName

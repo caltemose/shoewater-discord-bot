@@ -1,7 +1,10 @@
 var keyv = {
 
 	guilds: {
-		guildId: guildName // [String]
+		guildId: {
+			guildName, // [String]
+			guildPrefix,
+		},
 	},
 
 	roles: {

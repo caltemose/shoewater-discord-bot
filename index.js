@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const { token, prefix } = require('./config.json');
+const { token, defaultPrefix } = require('./config.json');
 
 //
 // data storage via Keyv
@@ -47,8 +47,38 @@ client.once('ready', () => {
 });
 
 client.on('message', async message => {
-	// ignore messages with no prefix or if coming from a bot
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+	// ignore commands from bots
+	if (message.author.bot) return;
+
+	// get guilds object from store
+	const guilds = await keyv.get('guilds');
+	const guildId = message.guild.id;
+	let prefix = defaultPrefix;
+
+	if (!guilds || !guilds[guildId]) {
+		if (!guilds) {
+			const guildObj = {};
+			guildObj[guildId] = { guildName: message.guild.name };
+			await keyv.set('guilds', guildObj);
+			// console.log('no guilds object, setting one', guildObj);
+		}
+		else if (!guilds[guildId]) {
+			guilds[guildId] = { guildName: message.guild.name };
+			await keyv.set('guilds', guilds);
+			// console.log('no matching guildId in guilds object, setting one', guilds);
+		}
+	}
+	else {
+		if (guilds[guildId].guildPrefix) {
+			prefix = guilds[guildId].guildPrefix;
+		}
+		// console.log(`The prefix for this guild is ${prefix}`);
+	}
+
+	// ignore messages that do not start with the prefix for this guild
+	if (!message.content.startsWith(prefix)) return;
+
 
 	// get possible command and arguments from the message
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
@@ -89,7 +119,7 @@ client.on('message', async message => {
 	}
 
 	try {
-		command.execute(message, args, keyv);
+		command.execute(message, args, keyv, prefix, guildId);
 	} catch (error) {
 		console.error(error);
 		message.reply('there was an error trying to execute that command.');
