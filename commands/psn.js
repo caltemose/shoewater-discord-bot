@@ -1,3 +1,9 @@
+const { getUsers } = require('../importer.js');
+
+const isMember = (username, membersByUsername) => {
+	return membersById[username];
+};
+
 module.exports = {
 	name: 'psn',
 	description: 'Manage PSNs of Discord users',
@@ -20,8 +26,8 @@ example:  !psn add shoewater shoewatersDifferentPSN
 		}
 
 		if (!psn) {
-			if (subcommand.toLowerCase() !== 'add') {
-				message.channel.send('No PSN list found. Try using the `psn add` command');
+			if (subcommand.toLowerCase() !== 'set') {
+				message.channel.send('No PSN list found. Try using the `psn set` command');
 				return;
 			}
 			else {
@@ -42,12 +48,13 @@ example:  !psn add shoewater shoewatersDifferentPSN
 		else {
 			if (!subcommand) {
 				let msg = '**Members with different PSNs**\n';
+				msg += '`Discord` => `PSN`\n';
 				for(const member in psn) {
-					msg += `${member} with PSN = ${psn[member]}\n`;
+					msg += `\`${member}\` => \`${psn[member]}\`\n`;
 				}
 				message.channel.send(msg);
 			} else {
-				if (subcommand.toLowerCase() === 'add') {
+				if (subcommand.toLowerCase() === 'set') {
 					const found = members.find( ({ username }) => username === args[1]);
 					if (!found) {
 						message.channel.send(`No member with name ${args[1]} was found.`);
@@ -61,10 +68,11 @@ example:  !psn add shoewater shoewatersDifferentPSN
 				}
 				else if (subcommand.toLowerCase() === 'all') {
 					let msg = '**All Members and their PSNs**\n';
+					msg += '`Discord` => `PSN`\n';
 					for(const member in members) {
 						const memberpsn = psn[members[member].username];
-						msg += members[member].username;
-						if (memberpsn) msg += ` / ${memberpsn}`;
+						msg += '`' + members[member].username + '`';
+						if (memberpsn) msg += ` => \`${memberpsn}\``;
 						msg += '\n';
 					}
 					message.channel.send(msg);
@@ -73,6 +81,26 @@ example:  !psn add shoewater shoewatersDifferentPSN
 					psn = {};
 					await keyv.set('psn', psn);
 					message.channel.send('The Discord->PSN list was deleted.');
+				}
+				else if (subcommand.toLowerCase() === 'import') {
+					const filepath = args[1] || '../discord-psn-list.txt';
+					const users = getUsers(filepath);
+					console.log('users.length', users.length);
+					if (!psn) psn = {};
+
+					const memberUsernames = [];
+					members.forEach(member => {
+						memberUsernames.push(member.username);
+					});
+
+					users.forEach(user => {
+						if (memberUsernames.includes(user.discord)) {
+							psn[user.discord] = user.psn;
+						}
+					});
+					
+					await keyv.set('psn', psn);
+					message.channel.send(`Users read from ${filepath}`);
 				}
 				else {
 					message.channel.send('subcommand not recognized.');

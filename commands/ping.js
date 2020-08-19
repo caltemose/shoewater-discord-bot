@@ -2,8 +2,7 @@ module.exports = {
 	name: 'ping',
 	description: 'Ping!',
 	cooldown: 5,
-	execute: async (message, args) => {
-		await keyv.set('ping', 'Pong.');
+	execute: (message) => {
 		message.channel.send('Pong.');
 	},
 };

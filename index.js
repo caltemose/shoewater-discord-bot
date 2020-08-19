@@ -53,6 +53,10 @@ client.on('message', async message => {
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
 
+	// if (commandName === 'mypsn') {
+	// 	args = message.content; //.slice(prefix.length).trim();
+	// }
+
 	// ignore message if given command isn't recognized
 	if (!client.commands.has(commandName)) return;
 
