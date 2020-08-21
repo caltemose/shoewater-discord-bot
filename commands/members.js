@@ -72,12 +72,3 @@ module.exports = {
 			.catch(console.error);
 	},
 };
-
-/*
-command.execute(message, args, keyv, prefix, guildId);
-
-roles = {
-	roleId: roleName
-}
-
-*/

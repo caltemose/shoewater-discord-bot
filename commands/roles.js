@@ -9,8 +9,6 @@ const getRolesString = (roles) => {
 };
 
 module.exports = {
-	//const name = 'roles';
-	//const description = 'Get roles for this guild.';
 	name: 'roles',
 	description: 'Get roles for this guild.',
 	cooldown: 5,
