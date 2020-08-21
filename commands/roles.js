@@ -1,3 +1,5 @@
+const ADMINISTRATOR = 'ADMINISTRATOR';
+
 const getRolesString = (roles) => {
 	var response = 'Roles in this guild:\n';
 	for (var role in roles) {
@@ -13,8 +15,12 @@ module.exports = {
 	description: 'Get roles for this guild.',
 	cooldown: 5,
 	execute: async (message, args, keyv, prefix, guildId) => {
+		if (!message.member.hasPermission(ADMINISTRATOR)) {
+			return message.channel.send('You do not have permissions to use the `roles` command.');
+		}
+
 		var rolesStore = await keyv.get('roles');
-		
+
 		if (!rolesStore) {
 			rolesStore = {};
 		}
