@@ -1,3 +1,5 @@
+const ADMINISTRATOR = 'ADMINISTRATOR';
+
 const getRoleIds = (roles) => {
 	var roleIds = {};
 	for (const id in roles) {
@@ -23,31 +25,45 @@ module.exports = {
 	description: 'Get members for this guild, sorted by role.',
 	cooldown: 5,
 	execute: async (message, args, keyv, prefix, guildId) => {
+		if (!message.member.hasPermission(ADMINISTRATOR)) {
+			return message.channel.send('You do not have permissions to use the `members` command.');
+		}
+
 		var allRoles = await keyv.get('roles');
+		if (!allRoles) {
+			allRoles = {};
+		}
+
 		var roles;
 		if (allRoles[guildId]) {
 			roles = allRoles[guildId];
 		}
-		else {
-		}
 		
 		if (!roles) {
-			message.channel.send('Could not find roles. Run the `roles` command to retrieve them before getting the members list.');
+			return message.channel.send('Could not find roles. Run the `roles` command to retrieve them before getting the members list.');
 		}
+
+		var allMembers = await keyv.get('members');
+		if (!allMembers) {
+			allMembers = {};
+		}
+
+		// no need to worry about what's in store since the only data stored there
+		// comes from Discord and can be safely overwritten. for now.
+		var guildMembers = {};
 
 		message.guild.members.fetch()
 			.then(collection => {
 				var membersByRoleId = getRoleIds(roles);
-				var members = [];
+
 				collection
 					.filter(user => !user.user.bot)
 					.each(user => {
-						console.log(user);
-						members.push({
+						guildMembers[user.user.id] = {
 							id: user.user.id,
 							username: user.user.username,
 							roles: user._roles,
-						});
+						};
 						user._roles.forEach(userRoleId => {
 							if (userRoleId && membersByRoleId[userRoleId]) {
 								membersByRoleId[userRoleId].push({
@@ -57,16 +73,11 @@ module.exports = {
 							}
 						});
 					});
-				// console.log('membersByRoleId', membersByRoleId);
+				
 				const membersList = getSortedMembersList(membersByRoleId, roles);
-				// console.log(membersList);
-				/*
-				determine best way to store members in JSON for associating PSNs
-				- this could happen in a different message
-				- need membersById object to speed up actions
-				- 
-				*/
-				keyv.set('members', members);
+
+				allMembers[guildId] = guildMembers;
+				keyv.set('members', allMembers);
 				message.channel.send(membersList);
 			})
 			.catch(console.error);
