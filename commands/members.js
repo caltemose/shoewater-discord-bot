@@ -78,7 +78,7 @@ module.exports = {
 
 				allMembers[guildId] = guildMembers;
 				keyv.set('members', allMembers);
-				message.channel.send(membersList);
+				return message.channel.send(membersList);
 			})
 			.catch(console.error);
 	},

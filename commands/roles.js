@@ -31,6 +31,7 @@ module.exports = {
 			.then(async roles => {
 				roles.cache
 					.each(role => {
+						// TODO add bot roles to ignore
 						if (role.name !== '@everyone') {
 							rolesStore[guildId][role.id] = role.name;
 						}
@@ -39,7 +40,7 @@ module.exports = {
 				let response;
 				if (rolesWereSet) response = getRolesString(rolesStore[guildId]);
 				else response = 'Could not set roles in keyv';
-				message.channel.send(response);
+				return message.channel.send(response);
 			})
 			.catch(console.error)
 	},
