@@ -30,12 +30,14 @@ module.exports = {
 		if (!rolesStore[guildId]) {
 			rolesStore[guildId] = {};
 		}
+		// always reset the data to delete roles that were deleted from Discord or
+		// added to the ignore list
+		else rolesStore[guildId] = {};
 
 		message.guild.roles.fetch()
 			.then(async roles => {
 				roles.cache
 					.each(role => {
-						// TODO add bot roles to ignore
 						if (!ignoredRoles.includes(role.name)) {
 							rolesStore[guildId][role.id] = role.name;
 						}

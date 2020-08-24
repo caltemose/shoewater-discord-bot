@@ -58,30 +58,38 @@ module.exports = {
 		message.guild.members.fetch()
 			.then(collection => {
 				var membersByRoleId = getRoleIds(roles);
+				var membersNoRole = [];
 
 				collection
 					.filter(user => !user.user.bot)
 					.each(user => {
-						guildMembers[user.user.id] = {
+						const userObj = {
 							id: user.user.id,
 							username: user.user.username,
 							roles: user._roles,
 						};
+						guildMembers[user.user.id] = userObj;
+						if (!user._roles || user._roles.length === 0) {
+							membersNoRole.push(userObj);
+						}
 						user._roles.forEach(userRoleId => {
 							if (userRoleId && membersByRoleId[userRoleId]) {
-								membersByRoleId[userRoleId].push({
-									id: user.user.id,
-									username: user.user.username,
-								});
+								membersByRoleId[userRoleId].push(userObj);
 							}
 						});
 					});
 				
-				const membersList = getSortedMembersList(membersByRoleId, roles);
+				let msg = getSortedMembersList(membersByRoleId, roles);
+				msg += `**Members without roles:**\n`;
+
+				membersNoRole.forEach(member => {
+					msg += member.username + '\n';
+				});
 
 				allMembers[guildId] = guildMembers;
 				keyv.set('members', allMembers);
-				return message.channel.send(membersList);
+
+				return message.channel.send(msg);
 			})
 			.catch(console.error);
 	},
