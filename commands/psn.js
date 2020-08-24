@@ -14,15 +14,14 @@ module.exports = {
 	name: 'psn',
 	description: 'Manage PSNs of Discord users',
 	cooldown: 3,
-	usage: `
-[psn] will show you all the members who have PSNs that are different from their Discord
-[psn all] will show you all members, including ones whose psn is the same as their Discord
-[psn unset] will show you the members who have not set their PSN yet
-[psn set DiscordName PSN] allows you to add a PSN to a Discord user. Note that the DiscordName is case-sensitive
-example:  !psn add shoewater shoewatersDifferentPSN
-[psn setsame DiscordName] sets the user's PSN to the same as their Discord
-[psn clear] will wipe the entire mapping of Discord->PSN for this guild. **Be careful**
-	`,
+	usage: [
+		{ text: 'will show you all the members who have PSNs that are different from their Discord' },
+		{ subcommand: 'all', text: 'will show you all members, including ones whose psn is the same as their Discord' },
+		{ subcommand: 'unset', text: 'will show you the members who have not set their PSN yet' },
+		{ subcommand: 'set DiscordName PSN', text: 'allows you to add a PSN to a Discord user. Note that the DiscordName is case-sensitive' },
+		{ subcommand: 'setsame DiscordName', text: 'sets the user\'s PSN the same as their Discord' },
+		{ subcommand: 'clear', text: 'will wipe the entire mapping of Discord->PSN for this guild. **Be careful**' },
+	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			return message.channel.send('You do not have permissions to use the `psn` command.');

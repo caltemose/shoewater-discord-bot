@@ -1,4 +1,4 @@
-const ADMINISTRATOR = 'ADMINISTRATOR';
+const { ADMINISTRATOR } = require('../helpers/constants');
 
 const getRoleIds = (roles) => {
 	var roleIds = {};
@@ -24,6 +24,9 @@ module.exports = {
 	name: 'members',
 	description: 'Get members for this guild, sorted by role.',
 	cooldown: 5,
+	usage: [
+		{ text: 'Lists the members of this Discord guild, sorted by roles. Requires the roles to be stored in memory ahead of time.' },
+	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			return message.channel.send('You do not have permissions to use the `members` command.');

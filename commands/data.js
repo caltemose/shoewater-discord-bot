@@ -1,11 +1,13 @@
-const ADMINISTRATOR = 'ADMINISTRATOR';
+const { ADMINISTRATOR } = require('../helpers/constants');
 const backupKeyv = require('../modules/backupKeyv');
 
 module.exports = {
 	name: 'data',
 	description: 'Data utilities for admins: `backup` is currently all that is implemented.',
 	cooldown: 10,
-	usage: '`data backup` creates a backup of all stored data on the bot computer.',
+	usage: [
+		{ subcommand: 'backup', text: 'creates a backup of all stored data on the bot computer.' },
+	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			return message.channel.send('You do not have permissions to use the `data` command.');

@@ -1,4 +1,5 @@
-const ADMINISTRATOR = 'ADMINISTRATOR';
+const { ADMINISTRATOR } = require('../helpers/constants');
+const ignoredRoles = [ '@everyone', 'shoewater bot' ];
 
 const getRolesString = (roles) => {
 	var response = 'Roles in this guild:\n';
@@ -12,6 +13,9 @@ module.exports = {
 	name: 'roles',
 	description: 'Get roles for this guild.',
 	cooldown: 5,
+	usage: [
+		{ text: `lists the roles for this guild and stores them in memory for use elsewhere. Ignores roles: \`${ignoredRoles.join(', ')}\`` },
+	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			return message.channel.send('You do not have permissions to use the `roles` command.');
@@ -32,7 +36,7 @@ module.exports = {
 				roles.cache
 					.each(role => {
 						// TODO add bot roles to ignore
-						if (role.name !== '@everyone') {
+						if (!ignoredRoles.includes(role.name)) {
 							rolesStore[guildId][role.id] = role.name;
 						}
 					})

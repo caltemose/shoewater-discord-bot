@@ -1,45 +1,86 @@
-const { prefix } = require('../config.json');
-
 module.exports = {
 	name: 'mypsn',
 	description: 'Manage what Discord thinks is your PSN (this does not affect your actual Sony PSN in any way).',
 	cooldown: 3,
-	usage: `
-'mypsn' shows you what your PSN is set to
-'mypsn set my new psn tag' lets you set your PSN
-'mypsn clear' sets your PSN to the same as your Discord username
-**DISCLAIMER: this does not have any affect on your real PSN with Sony/Playstation network. It is only stored in our Discord server.**
-	`,
-	execute: async (message, args, keyv) => {
-		var psn = await keyv.get('psn');
-		const myCurrentPsn = psn[message.author.username];
+	usage: [
+		{ text: 'shows you what your PSN is set to in this Discord guild.' },
+		{ subcommand: 'set myNewPsn', text: 'lets you associate the given PSN with your Discord name.' },
+		{ subcommand: 'setsame', text: 'sets your PSN to the same as your Discord username' },
+	],
+	execute: async (message, args, keyv, prefix, guildId) => {
+		const allMembers = await keyv.get('members');
+		var guildMembers;
+		if (allMembers) {
+			guildMembers = allMembers[guildId];
+		}
+
+		if (!allMembers || !guildMembers || !Object.keys(guildMembers).length) {
+			return message.channel.send('No member list found. Report this to an admin please.');
+		}
+		
+		const myDiscordId = message.author.id;
+		if (!guildMembers[myDiscordId]) {
+			// TODO this should add the member to the members list properly
+			return message.channel.send('Your Discord user was not found in the members list. Report this to an admin please.');
+		}
+
+		var allPsn = await keyv.get('psn');
+		var guildPsn;
+
+		if (!allPsn) {
+			allPsn = {};
+			guildPsn = {};
+		}
+		else {
+			guildPsn = allPsn[guildId];
+			if (!guildPsn) {
+				guildPsn = {};
+			}
+		}
+
+		const myCurrentPsnObj = guildPsn[myDiscordId];
 		
 		const subcommand = args.shift();
+		
 		const myNewPsn = args.join(' ');
 
 		if (!subcommand) {
-			return myCurrentPsn ?
-				message.channel.send(`Your PSN is: \`${myCurrentPsn}\``) 
-				:
-				message.channel.send(`Your PSN is the same as your Discord username: \`${message.author.username}\``);
+			var msg = '';
+			if (!myCurrentPsnObj) {
+				msg = 'You have not setup your PSN for your Discord user yet.';
+			}
+			else if (myCurrentPsnObj.same) {
+				msg = `Your PSN is the same as your Discord username: \`${message.author.username}\``;
+			}
+			else if (myCurrentPsnObj.psn) {
+				msg = `Your PSN is: \`${myCurrentPsnObj.psn}\``;
+			}
+			else {
+				msg = `Something's wonky. Contact an admin please.`;
+			}
+			return message.channel.send(msg);
 		}
-		else if (subcommand === 'set') {
+		
+		if (subcommand === 'set') {
 			if (!myNewPsn) {
-				return message.channel.send(`You must supply a valid PSN: ${prefix}mypsn set validPSNtag`);
+				return message.channel.send(`You must supply a valid PSN: \`${prefix}mypsn set validPSNtag\``);
 			}
 			else {
 				// TODO check to see this doesn't clash with an existing PSN in the database
 
-				psn[message.author.username] = myNewPsn;
-				await keyv.set('psn', psn);
+				guildPsn[message.author.id] = { psn: myNewPsn };
+				allPsn[guildId] = guildPsn;
+				await keyv.set('psn', allPsn);
 
 				return message.channel.send(`Your PSN is now set to: \`${myNewPsn}\``);
 			}
 		}
-		else if (subcommand === 'clear') {
-			delete psn[message.author.username];
-			await keyv.set('psn', psn);
-			return message.channel.send('Your PSN has been cleared.');
+		else if (subcommand === 'setsame') {
+			guildPsn[message.author.id] = { same: true };
+			allPsn[guildId] = guildPsn;
+			await keyv.set('psn', allPsn);
+
+			return message.channel.send('Your PSN has been set to the same as your Discord name.');
 		}
 		
 	},
