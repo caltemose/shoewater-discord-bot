@@ -10,6 +10,7 @@ const getRoleIds = (roles) => {
 
 const getSortedMembersList = (membersByRoleId, roles) => {
 	var message = 'Members sorted by role:\n\n';
+	// console.log(membersByRoleId);
 	Object.keys(roles).forEach(key => {
 		message += `**${roles[key]}**\n`;
 		membersByRoleId[key].forEach(member => {
@@ -59,13 +60,15 @@ module.exports = {
 			.then(collection => {
 				var membersByRoleId = getRoleIds(roles);
 				var membersNoRole = [];
+				var membersWithNickname = [];
 
 				collection
 					.filter(user => !user.user.bot)
 					.each(user => {
+						if (user.nickname) membersWithNickname.push({ id: user.user.id, nickname: user.nickname, username: user.user.username });
 						const userObj = {
 							id: user.user.id,
-							username: user.user.username,
+							username: user.nickname || user.user.username,
 							roles: user._roles,
 						};
 						guildMembers[user.user.id] = userObj;
@@ -79,15 +82,22 @@ module.exports = {
 						});
 					});
 				
-				let msg = getSortedMembersList(membersByRoleId, roles);
-				msg += `**Members without roles:**\n`;
+				console.log(membersWithNickname);
 
-				membersNoRole.forEach(member => {
-					msg += member.username + '\n';
-				});
+				let msg = getSortedMembersList(membersByRoleId, roles);
+
+				if (membersNoRole.length) {
+					msg += `**Members without roles:**\n`;
+
+					membersNoRole.forEach(member => {
+						msg += member.username + '\n';
+					});
+				}
 
 				allMembers[guildId] = guildMembers;
 				keyv.set('members', allMembers);
+
+				// console.log(msg);
 
 				return message.channel.send(msg);
 			})
