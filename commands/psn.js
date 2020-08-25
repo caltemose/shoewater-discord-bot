@@ -1,9 +1,9 @@
 // const { getUsers } = require('../importer.js');
 const { ADMINISTRATOR } = require('../helpers/constants');
 
-const getGuildMemberByUsername = (members, username) => {
+const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {
-		if (members[i].username === username) {
+		if (members[i].displayName === displayName) {
 			return members[i];
 		}
 	}
@@ -54,7 +54,7 @@ module.exports = {
 		const subcommand = args[0];
 
 		const setMemberPsn = async (same) => {
-			const foundUser = getGuildMemberByUsername(guildMembers, args[1]);
+			const foundUser = getGuildMemberByDisplayName(guildMembers, args[1]);
 			if (!foundUser) {
 				return message.channel.send(`No member with name ${args[1]} was found.`);
 			}
@@ -93,12 +93,13 @@ module.exports = {
 		}
 		else {
 			if (!subcommand) {
-				let msg = '**Members with set PSNs**\n';
-				msg += '`Discord` => `PSN`\n';
+				let msg = '```**Members with set PSNs**\n';
+				msg += 'Discord => PSN\n';
 				for(const memberId in guildPsn) {
 					const setTo = guildPsn[memberId].same ? 'same as Discord' : guildPsn[memberId].psn;
-					msg += `\`${guildMembers[memberId].username}\` => \`${setTo}\`\n`;
+					msg += `${guildMembers[memberId].displayName} => ${setTo}\n`;
 				}
+				msg += '```';
 				return message.channel.send(msg);
 			} 
 			else {
@@ -115,28 +116,30 @@ module.exports = {
 					return await setMemberPsn(true);
 				}
 				else if (subcommand.toLowerCase() === 'all') {
-					let msg = '**All Members and their PSNs**\n';
-					msg += '`Discord` => `PSN`\n';
+					let msg = '```**All Members and their PSNs**\n';
+					msg += 'Discord => PS\n';
 
 					for(const memberId in guildMembers) {
 						let memberPsn;
 
-						if (!guildPsn[memberId]) memberPsn = '`UNSET`';
+						if (!guildPsn[memberId]) memberPsn = 'UNSET';
 						else memberPsn = guildPsn[memberId].same ? 'same as Discord' : guildPsn[memberId].psn;
 
-						msg += '`' + guildMembers[memberId].username + '` => ' + `\`${memberPsn}\`\n`;
+						msg += guildMembers[memberId].displayName + ' => ' + `${memberPsn}\n`;
 					}
 
+					msg += '```';
 					return message.channel.send(msg);
 				}
 				else if (subcommand.toLowerCase() === 'unset') {
-					let msg = '**Members who have not set their PSN**\n';
+					let msg = '```**Members who have not set their PSN**\n';
 					for(const memberId in guildMembers) {
 						if (!guildPsn[memberId]) {
 
-							msg += guildMembers[memberId].username + '\n';
+							msg += guildMembers[memberId].displayName + '\n';
 						}
 					}
+					msg += '```';
 					return message.channel.send(msg);
 				}
 				else if (subcommand.toLowerCase() === 'clear') {
