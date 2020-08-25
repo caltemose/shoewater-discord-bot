@@ -50,6 +50,9 @@ module.exports = {
 				msg = 'You have not setup your PSN for your Discord user yet.';
 			}
 			else if (myCurrentPsnObj.same) {
+				console.log('message.author.username', message.author.username);
+				// TODO needs to look up the user's nickname instead.
+				//  see: https://github.com/caltemose/shoewater-discord-bot/issues/19
 				msg = `Your PSN is the same as your Discord username: \`${message.author.username}\``;
 			}
 			else if (myCurrentPsnObj.psn) {

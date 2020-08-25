@@ -20,6 +20,7 @@ const getCommandHelp = (command, prefix) => {
 		});
 		data.push(msg);
 	}
+	else data.push(' ');
 
 	
 

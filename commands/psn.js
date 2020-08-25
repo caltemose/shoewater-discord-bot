@@ -133,6 +133,7 @@ module.exports = {
 					let msg = '**Members who have not set their PSN**\n';
 					for(const memberId in guildMembers) {
 						if (!guildPsn[memberId]) {
+
 							msg += guildMembers[memberId].username + '\n';
 						}
 					}
