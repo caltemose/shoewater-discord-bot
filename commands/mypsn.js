@@ -1,3 +1,12 @@
+const getDisplayNameById = (members, id) => {
+	for (var i in members) {
+		if (i === id) {
+			return members[i].displayName;
+		}
+	}
+	return null;
+};
+
 module.exports = {
 	name: 'mypsn',
 	description: 'Manage what Discord thinks is your PSN (this does not affect your actual Sony PSN in any way).',
@@ -5,7 +14,7 @@ module.exports = {
 	usage: [
 		{ text: 'shows you what your PSN is set to in this Discord guild.' },
 		{ subcommand: 'set myNewPsn', text: 'lets you associate the given PSN with your Discord name.' },
-		{ subcommand: 'setsame', text: 'sets your PSN to the same as your Discord username' },
+		{ subcommand: 'setsame', text: 'sets your PSN to the same as your Discord name' },
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		const allMembers = await keyv.get('members');
@@ -50,10 +59,8 @@ module.exports = {
 				msg = 'You have not setup your PSN for your Discord user yet.';
 			}
 			else if (myCurrentPsnObj.same) {
-				console.log('message.author.username', message.author.username);
-				// TODO needs to look up the user's nickname instead.
-				//  see: https://github.com/caltemose/shoewater-discord-bot/issues/19
-				msg = `Your PSN is the same as your Discord username: \`${message.author.username}\``;
+				const displayName = getDisplayNameById(guildMembers, message.author.id);
+				msg = `Your PSN is the same as your Discord username: \`${displayName}\``;
 			}
 			else if (myCurrentPsnObj.psn) {
 				msg = `Your PSN is: \`${myCurrentPsnObj.psn}\``;
