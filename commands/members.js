@@ -1,4 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
+const NO_ROLE = 'no role';
 
 const getRoleIds = (roles) => {
 	var roleIds = {};
@@ -17,6 +18,11 @@ const getSortedMembersList = (membersByRoleId, roles) => {
 			message += member.displayName + '\n';
 		});
 		message += '\n';
+	});
+
+	message += '**No Role Assigned**\n';
+	membersByRoleId[NO_ROLE].forEach(member => {
+		message += member.displayName + '\n';
 	});
 	
 	message += '```';
@@ -102,7 +108,6 @@ module.exports = {
 				return message.channel.send('There is no member list. Run the `members update` command first.');
 			}
 
-			const NO_ROLE = 'no role';
 			var membersByRoleId = getRoleIds(guildRoles);
 			membersByRoleId[NO_ROLE] = [];
 
