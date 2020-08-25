@@ -9,42 +9,31 @@ const getRoleIds = (roles) => {
 };
 
 const getSortedMembersList = (membersByRoleId, roles) => {
-	var message = 'Members sorted by role:\n\n';
-	// console.log(membersByRoleId);
+	var message = '```Members sorted by role:\n\n';
+	
 	Object.keys(roles).forEach(key => {
 		message += `**${roles[key]}**\n`;
 		membersByRoleId[key].forEach(member => {
-			message += member.username + '\n';
+			message += member.displayName + '\n';
 		});
 		message += '\n';
 	});
+	
+	message += '```';
+	
 	return message;
 };
 
 module.exports = {
 	name: 'members',
 	description: 'Get members for this guild, sorted by role.',
-	cooldown: 5,
 	usage: [
 		{ text: 'Lists the members of this Discord guild, sorted by roles. Requires the roles to be stored in memory ahead of time.' },
+		{ subcommand: 'update', text: 'Rebuilds the members list for this guild.' },
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			return message.channel.send('You do not have permissions to use the `members` command.');
-		}
-
-		var allRoles = await keyv.get('roles');
-		if (!allRoles) {
-			allRoles = {};
-		}
-
-		var roles;
-		if (allRoles[guildId]) {
-			roles = allRoles[guildId];
-		}
-		
-		if (!roles) {
-			return message.channel.send('Could not find roles. Run the `roles` command to retrieve them before getting the members list.');
 		}
 
 		var allMembers = await keyv.get('members');
@@ -52,55 +41,87 @@ module.exports = {
 			allMembers = {};
 		}
 
-		// no need to worry about what's in store since the only data stored there
-		// comes from Discord and can be safely overwritten. for now.
-		var guildMembers = {};
+		const subcommand = args[0];
 
-		message.guild.members.fetch()
-			.then(collection => {
-				var membersByRoleId = getRoleIds(roles);
-				var membersNoRole = [];
-				var membersWithNickname = [];
+		if (subcommand === 'update') {
+			// guild members list is always overwritten when updated
+			var guildMembers = {};
 
-				collection
-					.filter(user => !user.user.bot)
-					.each(user => {
-						if (user.nickname) membersWithNickname.push({ id: user.user.id, nickname: user.nickname, username: user.user.username });
-						const userObj = {
-							id: user.user.id,
-							username: user.nickname || user.user.username,
-							roles: user._roles,
-						};
-						guildMembers[user.user.id] = userObj;
-						if (!user._roles || user._roles.length === 0) {
-							membersNoRole.push(userObj);
-						}
-						user._roles.forEach(userRoleId => {
-							if (userRoleId && membersByRoleId[userRoleId]) {
-								membersByRoleId[userRoleId].push(userObj);
-							}
+			message.guild.members.fetch()
+				.then(collection => {
+					collection
+						.filter(user => !user.user.bot)
+						.each(user => {
+							const userObj = {
+								id: user.user.id,
+								username: user.user.username,
+								nickname: user.nickname,
+								displayName: user.nickname || user.user.username,
+								roles: user._roles,
+							};
+							guildMembers[user.user.id] = userObj;
 						});
-					});
-				
-				console.log(membersWithNickname);
 
-				let msg = getSortedMembersList(membersByRoleId, roles);
+					allMembers[guildId] = guildMembers;
+					keyv.set('members', allMembers);
 
-				if (membersNoRole.length) {
-					msg += `**Members without roles:**\n`;
+					return message.channel.send('members list has been updated.');
+				})
+				.catch(console.error);
+		}
+		else if (subcommand === 'clear') {
+			if (allMembers[guildId]) {
+				allMembers[guildId] = {};
+				await keyv.set('members', allMembers);
+				return message.channel.send('members list for this guild has been cleared.');
+			}
+		}
+		else if (!subcommand) {
+			let rolesIssues;
 
-					membersNoRole.forEach(member => {
-						msg += member.username + '\n';
+			var allRoles = await keyv.get('roles');
+			if (!allRoles) {
+				rolesIssues = 'Could not find roles. Run the `roles` command to retrieve them before getting the members list.';
+			}
+
+			var guildRoles;
+			if (allRoles && allRoles[guildId]) {
+				guildRoles = allRoles[guildId];
+			}
+
+			if (!guildRoles) {
+				rolesIssues = 'Could not find roles. Run the `roles` command to retrieve them before getting the members list.';
+			}
+
+			if (rolesIssues) {
+				return message.channel.send(rejection);
+			}
+
+			const guildMembers = allMembers[guildId];
+			if (!guildMembers) {
+				return message.channel.send('There is no member list. Run the `members update` command first.');
+			}
+
+			const NO_ROLE = 'no role';
+			var membersByRoleId = getRoleIds(guildRoles);
+			membersByRoleId[NO_ROLE] = [];
+
+			for(var memberId in guildMembers) {
+				const member = guildMembers[memberId];
+
+				if (!member.roles || !member.roles.length) {
+					membersByRoleId[NO_ROLE].push(member);
+				}
+				else {
+					member.roles.forEach(userRoleId => {
+						if (membersByRoleId[userRoleId]) {
+							membersByRoleId[userRoleId].push(member);
+						}
 					});
 				}
+			}
 
-				allMembers[guildId] = guildMembers;
-				keyv.set('members', allMembers);
-
-				// console.log(msg);
-
-				return message.channel.send(msg);
-			})
-			.catch(console.error);
+			return message.channel.send( getSortedMembersList(membersByRoleId, guildRoles) );
+		}
 	},
 };
