@@ -24,10 +24,10 @@ module.exports = {
 		if (subcommand === 'backup') {
 			try {
 				await backupKeyv('../keyv.json', '../backups');
-				logger('keyv file has been backed up.');
+				logger('keyv file has been backed up.', getISOStamp());
 				return message.channel.send('Data has been backed up.');
 			} catch (err) {
-				logger('! keyv WAS NOT backed up.', err);
+				logger('! keyv WAS NOT backed up.', getISOStamp(), err);
 				return message.channel.send('Data WAS NOT backed up. contact @shoewater.');
 			}
 		}
