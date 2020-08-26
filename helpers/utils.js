@@ -7,7 +7,7 @@ const getDivider = size => {
 }
 
 module.exports = {
-	logError: function () {
+	logger: function () {
 		let msg = getDivider(80) + Array.from(arguments).join('\n') + getDivider(70);
 		console.error(msg);
 	},
