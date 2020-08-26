@@ -11,7 +11,7 @@ module.exports = {
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
-			logger(`'${getNameFromMessage(message)}' tried to access the 'data' command`, getISOStamp());
+			logger(`'${getNameFromMessage(message)}' tried to access the 'data' command without permission.`, getISOStamp());
 			return message.channel.send('You do not have permissions to use the `data` command.');
 		}
 

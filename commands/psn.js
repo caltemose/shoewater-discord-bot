@@ -1,5 +1,6 @@
 // const { getUsers } = require('../importer.js');
 const { ADMINISTRATOR } = require('../helpers/constants');
+const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
 
 const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {
@@ -24,6 +25,7 @@ module.exports = {
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
+			logger(`'${getNameFromMessage(message)}' tried to access the 'psn' command without permission.`, getISOStamp());
 			return message.channel.send('You do not have permissions to use the `psn` command.');
 		}
 
@@ -34,6 +36,7 @@ module.exports = {
 		}
 
 		if (!allMembers || !guildMembers || !Object.keys(guildMembers).length) {
+			logger(`'${getNameFromMessage(message)}' ran the 'psn' command without an existing member list.`, getISOStamp());
 			return message.channel.send('No member list found. Run the `members` command first.');
 		}
 
@@ -56,6 +59,7 @@ module.exports = {
 		const setMemberPsn = async (same) => {
 			const foundUser = getGuildMemberByDisplayName(guildMembers, args[1]);
 			if (!foundUser) {
+				logger(`'${getNameFromMessage(message)}' tried to set a member's psn but no member was found.`, args[1], getISOStamp());
 				return message.channel.send(`No member with name ${args[1]} was found.`);
 			}
 			else {
@@ -73,17 +77,20 @@ module.exports = {
 			// if the guildPsn has no data yet these are the only allowed commands
 			const allowed = [ 'set', 'setsame' ];
 			if (!subcommand || !allowed.includes(subcommand.toLowerCase())) {
+				logger(`'${getNameFromMessage(message)}' tried to set a psn but a psn list was not found.`, getISOStamp());
 				return message.channel.send('No PSN list found. Try using the `psn set` command');
 			}
 			else {
 				let same;
 				if (subcommand.toLowerCase() === 'set') {
 					if (!args[1] || !args[2]) {
+						logger(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (2) error.`, args[1], args[2], getISOStamp());
 						return message.channel.send('You must supply a valid Discord Name and PSN.');
 					}
 				}
 				else {
 					if (!args[1]) {
+						logger(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (1) error.`, args[1], getISOStamp());
 						return message.channel.send('You must supply a valid Discord Name.');
 					}
 					same = true;
@@ -105,12 +112,14 @@ module.exports = {
 			else {
 				if (subcommand.toLowerCase() === 'set') {
 					if (!args[1] || !args[2]) {
+						logger(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (2) error.`, args[1], args[2], getISOStamp());
 						return message.channel.send('You must supply a valid Discord Name and PSN.');
 					}
 					return await setMemberPsn();
 				}
 				else if (subcommand.toLowerCase() === 'setsame') {
 					if (!args[1]) {
+						logger(`'${getNameFromMessage(message)}' used 'psn setsame' and received a bad arguments (1) error.`, args[1], getISOStamp());
 						return message.channel.send('You must supply a valid Discord Name.');
 					}
 					return await setMemberPsn(true);
@@ -145,6 +154,7 @@ module.exports = {
 				else if (subcommand.toLowerCase() === 'clear') {
 					allPsn[guildId] = {};
 					await keyv.set('psn', allPsn);
+					logger(`'${getNameFromMessage(message)}' used 'psn clear' and deleted the guild's psn list.`, getISOStamp());
 					return message.channel.send('The Discord->PSN list for this guild was deleted.');
 				}
 				else if (subcommand.toLowerCase() === 'import') {

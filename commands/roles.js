@@ -1,4 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
+const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
 const ignoredRoles = [ '@everyone', 'shoewater bot' ];
 
 const getRolesString = (roles) => {
@@ -18,6 +19,7 @@ module.exports = {
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
+			logger(`'${getNameFromMessage(message)}' tried to access the 'data' command without permission.`, getISOStamp());
 			return message.channel.send('You do not have permissions to use the `roles` command.');
 		}
 
@@ -45,7 +47,10 @@ module.exports = {
 				const rolesWereSet = await keyv.set('roles', rolesStore);
 				let response;
 				if (rolesWereSet) response = getRolesString(rolesStore[guildId]);
-				else response = 'Could not set roles in keyv';
+				else {
+					logger(`'${getNameFromMessage(message)}' used 'roles' and setting the keyv store failed.`, getISOStamp());
+					response = 'Could not set roles in keyv';
+				}
 				return message.channel.send(response);
 			})
 			.catch(console.error)

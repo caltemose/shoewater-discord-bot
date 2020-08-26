@@ -1,3 +1,5 @@
+const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
+
 const getDisplayNameById = (members, id) => {
 	for (var i in members) {
 		if (i === id) {
@@ -24,13 +26,15 @@ module.exports = {
 		}
 
 		if (!allMembers || !guildMembers || !Object.keys(guildMembers).length) {
-			return message.channel.send('No member list found. Report this to an admin please.');
+			logger(`'${getNameFromMessage(message)}' used 'mypsn' and triggered an error`, 'memberlist not found', getISOStamp());
+			return message.channel.send('No member list found. Report this to @shoewater please.');
 		}
 		
 		const myDiscordId = message.author.id;
 		if (!guildMembers[myDiscordId]) {
 			// TODO this should add the member to the members list properly
-			return message.channel.send('Your Discord user was not found in the members list. Report this to an admin please.');
+			logger(`'${getNameFromMessage(message)}' used 'mypsn' and their user was not found in the member list.`, getISOStamp());
+			return message.channel.send('Your Discord user was not found in the members list. Report this to @shoewater please.');
 		}
 
 		var allPsn = await keyv.get('psn');
@@ -73,6 +77,7 @@ module.exports = {
 		
 		if (subcommand === 'set') {
 			if (!myNewPsn) {
+				logger(`'${getNameFromMessage(message)}' used 'mypsn set' without a valid PSN.`, getISOStamp());
 				return message.channel.send(`You must supply a valid PSN: \`${prefix}mypsn set validPSNtag\``);
 			}
 			else {
