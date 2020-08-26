@@ -1,4 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
+const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
 
 module.exports = {
 	name: 'format',
@@ -6,6 +7,7 @@ module.exports = {
 	cooldown: 1,
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
+			logger(`'${getNameFromMessage(message)}' tried to access the 'format' command`, getISOStamp());
 			return message.channel.send('You do not have permissions to use the `format` command.');
 		}
 
