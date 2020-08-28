@@ -1,6 +1,6 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
 const { getNameFromMessage } = require('../helpers/utils');
-const { logger } = require('../modules/logger');
+const logger = require('../modules/logger');
 
 module.exports = {
 	name: 'format',

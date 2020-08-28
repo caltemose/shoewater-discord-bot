@@ -1,5 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger } = require('../modules/logger');
+const logger = require('../modules/logger');
 const { getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
 const NO_ROLE = 'no role';
 

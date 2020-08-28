@@ -1,5 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger } = require('../modules/logger');
+const logger = require('../modules/logger');
 const { getNameFromMessage } = require('../helpers/utils');
 const ignoredRoles = [ '@everyone', 'shoewater bot' ];
 
