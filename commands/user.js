@@ -1,5 +1,6 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
+const { logger } = require('../modules/logger');
+const { getNameFromMessage } = require('../helpers/utils');
 
 module.exports = {
 	name: 'user',
@@ -7,7 +8,7 @@ module.exports = {
 	cooldown: 3,
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
-			logger(`'${getNameFromMessage(message)}' used the 'user' command without permission.`, getISOStamp());
+			logger.warn(`'${getNameFromMessage(message)}' used the 'user' command without permission.`);
 			return message.channel.send('You do not have permissions to use the `user` command.');
 		}
 

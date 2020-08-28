@@ -1,5 +1,6 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger, getISOStamp, getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
+const { logger } = require('../modules/logger');
+const { getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
 const NO_ROLE = 'no role';
 
 const getRoleIds = (roles) => {
@@ -44,7 +45,7 @@ module.exports = {
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
-			logger(`'${getNameFromMessage(message)}' tried to access the 'members' command`, getISOStamp());
+			logger.warn(`'${getNameFromMessage(message)}' tried to access the 'members' command`);
 			return message.channel.send('You do not have permissions to use the `members` command.');
 		}
 
@@ -76,16 +77,16 @@ module.exports = {
 
 					allMembers[guildId] = guildMembers;
 					keyv.set('members', allMembers);
-					logger(`'${getNameFromMessage(message)}' ran the 'members' command and updated the member list.`, getISOStamp());
+					logger.info(`'${getNameFromMessage(message)}' ran the 'members' command and updated the member list.`);
 					return message.channel.send('members list has been updated.');
 				})
-				.catch(console.error);
+				.catch(logger.error);
 		}
 		else if (subcommand === 'clear') {
 			if (allMembers[guildId]) {
 				allMembers[guildId] = {};
 				await keyv.set('members', allMembers);
-				logger(`'${getNameFromMessage(message)}' cleared the member list.`, getISOStamp());
+				logger.info(`'${getNameFromMessage(message)}' cleared the member list.`);
 				return message.channel.send('members list for this guild has been cleared.');
 			}
 		}
@@ -107,13 +108,13 @@ module.exports = {
 			}
 
 			if (rolesIssues) {
-				logger(`'${getNameFromMessage(message)}' ran the 'members' command and received a rejection message.`, rejection, getISOStamp());
+				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command and received a rejection message.`, rejection);
 				return message.channel.send(rejection);
 			}
 
 			const guildMembers = allMembers[guildId];
 			if (!guildMembers) {
-				logger(`'${getNameFromMessage(message)}' ran the 'members' command without a members list.`, getISOStamp());
+				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command without a members list.`);
 				return message.channel.send('There is no member list. Run the `members update` command first.');
 			}
 

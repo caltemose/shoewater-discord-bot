@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const getFileDateStamp = require('../modules/getFileDateStamp');
+const logger = require('../modules/logger');
 
 const Keyv = require('keyv');
 const KeyvFile = require('keyv-file').KeyvFile;
@@ -14,7 +15,7 @@ const keyv = new Keyv({
 	})
 });
 
-keyv.on('error', err => console.error('Connection Error', err));
+keyv.on('error', err => logger.error('Connection Error', err));
 
 const init = async () => {
 	const DIV = '============================================================';
@@ -24,26 +25,21 @@ const init = async () => {
 	const roles = await keyv.get('roles');
 	if (roles) {
 		data.roles = roles;
-		// console.log(roles);
-		// console.log(DIV);
 	}
 	
 	const members = await keyv.get('members');
 	if (members) {
 		data.members = members;
-		// console.log(members);
-		// console.log(DIV);
 	}
 	
 	const psn = await keyv.get('psn');
 	if (psn) {
 		data.psn = psn;
-		// console.log(psn);
 	}
-
-	fs.writeFile('./backups/keyv-json.' + getFileDateStamp.forNow() + '.json', JSON.stringify(data, null, 2), (err) => {
-		if (err) console.log(err);
-		else console.log('success writing file');
+	const filepath = './backups/keyv-json.' + getFileDateStamp.forNow() + '.json';
+	fs.writeFile(filepath, JSON.stringify(data, null, 2), (err) => {
+		if (err) logger.error(err);
+		else logger.log(`Success writing file: ${filepath}`);
 	});
 
 };

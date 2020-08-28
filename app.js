@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const { token, defaultPrefix } = require('./config.json');
+const logger = require('./modules/logger');
 
 //
 // data storage via Keyv
@@ -20,7 +21,7 @@ const keyv = new Keyv({
 	})
 });
 
-keyv.on('error', err => console.error('Connection Error', err));
+keyv.on('error', err => logger.error('Connection Error', err));
 
 //
 // initialize discord client and commands
@@ -43,7 +44,7 @@ for (const file of commandFiles) {
 //
 
 client.once('ready', () => {
-	console.log(`Logged in as ${client.user.tag}!`);
+	logger.info(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', async message => {
@@ -121,14 +122,14 @@ client.on('message', async message => {
 	try {
 		command.execute(message, args, keyv, prefix, guildId);
 	} catch (error) {
-		console.error(error);
+		logger.error(error);
 		message.reply('there was an error trying to execute that command.');
 	}
 
 });
 
 client.on('shardError', error => {
-	console.error('A websocket connection encountered an error:', error);
+	logger.error('A websocket connection encountered an error:', error);
 	/*
 	ECONNRESET - The connection was forcibly closed by a peer, thrown by the loss of connection to a websocket due to timeout or reboot.
 	ETIMEDOUT - A connect or send request failed because the receiving party did not respond after some time.
@@ -149,11 +150,14 @@ client.login(token);
  * This is used only for hosting on Dreamhost so that a public URL can be hit
  * to determine if the bot is running *and* because Dreamhost uses Passenger
  * which needs to have a live page hit in order to fire up the node app.
+ * Note that the port in this case is overwritten by Passenger as port 80/443.
  */
-const http = require("http");
+if (process.env.NODE_ENV === 'production') {
+	const http = require("http");
 
-http.createServer(function(request, response) {
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("shoebot running");
-  response.end();
-}).listen(8888);
+	http.createServer(function(request, response) {
+	response.writeHead(200, {"Content-Type": "text/plain"});
+	response.write("shoebot running");
+	response.end();
+	}).listen(8888);
+}

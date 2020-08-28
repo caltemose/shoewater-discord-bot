@@ -1,5 +1,6 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
+const { getNameFromMessage } = require('../helpers/utils');
+const { logger } = require('../modules/logger');
 
 module.exports = {
 	name: 'clear',
@@ -7,14 +8,14 @@ module.exports = {
 	cooldown: 5,
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
-			logger(`'${getNameFromMessage(message)}' tried to access the 'clear' command`, getISOStamp());
+			logger.warn(`'${getNameFromMessage(message)}' tried to access the 'clear' command`);
 			return message.channel.send('You do not have permissions to use the `clear` command.');
 		}
 
 		const deleteCount = parseInt(args[0], 10);
 
 		if (!deleteCount || deleteCount < 2 || deleteCount > 100) {
-			logger(`'${getNameFromMessage(message)}' used 'clear' command with deleteCount of ${deleteCount}`, getISOStamp());
+			logger.warn(`'${getNameFromMessage(message)}' used 'clear' command with deleteCount of ${deleteCount}`);
 			return message.channel.send("Please provide a number between 2 and 100 for the number of messages to delete");
 		}
 
@@ -22,7 +23,7 @@ module.exports = {
 		message.channel
 			.bulkDelete(fetched)
 			.catch(error => {
-				logger(`bulkDelete error at ${getISOStamp()}`, error);
+				logger.error(`bulkDelete error`, error);
 				message.reply(`Couldn't delete messages: ${error}`);
 			});
 	},
