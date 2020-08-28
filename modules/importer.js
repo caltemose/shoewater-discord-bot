@@ -2,16 +2,21 @@ const fs = require('fs');
 
 const getLineObject = line => {
 	const split = line.split('/');
+	
 	let user = {};
-	user.psn = split.shift().trim();
+	user.psn = {};
+	const psnString = split.shift().trim();
+
 	let remainder = split.join('/');
 	remainder = remainder.trimStart();
 	
 	if (remainder.trimEnd().toLowerCase() === 'same') {
-		user.discord = user.psn;
+		user.displayName = psnString;
+		user.psn.same = true;
 	}
 	else {
-		user.discord = remainder
+		user.displayName = remainder;
+		user.psn.psn = psnString;
 	}
 	return user;
 };
