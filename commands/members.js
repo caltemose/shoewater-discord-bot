@@ -1,5 +1,5 @@
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
+const { logger, getISOStamp, getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
 const NO_ROLE = 'no role';
 
 const getRoleIds = (roles) => {
@@ -11,22 +11,26 @@ const getRoleIds = (roles) => {
 };
 
 const getSortedMembersList = (membersByRoleId, roles) => {
-	var message = '```Members sorted by role:\n\n';
-	
+	var message = '';
+	// TODO need a guild-specific and not shite hard-coded solution
+	const ignoredRoles = ['729481197872349235', '729629552850239549', '729640707282960395', '729640886559834153', '729739903428198411'];
+
 	Object.keys(roles).forEach(key => {
-		message += `**${roles[key]}**\n`;
-		membersByRoleId[key].forEach(member => {
-			message += member.displayName + '\n';
-		});
-		message += '\n';
+		if (!ignoredRoles.includes(key)) {
+			message += `**${roles[key].toUpperCase()}:**\n`;
+			membersByRoleId[key].forEach(member => {
+				message += member.displayName + '\n';
+			});
+			message += '\n';
+		}
 	});
 
-	message += '**No Role Assigned**\n';
-	membersByRoleId[NO_ROLE].forEach(member => {
-		message += member.displayName + '\n';
-	});
-	
-	message += '```';
+	if (membersByRoleId[NO_ROLE].length) {
+		message += '**NO ROLE ASSIGNED:**\n';
+		membersByRoleId[NO_ROLE].forEach(member => {
+			message += member.displayName + '\n';
+		});
+	}
 	
 	return message;
 };
@@ -130,8 +134,14 @@ module.exports = {
 					});
 				}
 			}
+			const fullMessage = getSortedMembersList(membersByRoleId, guildRoles);
+			
+			const msgArray = splitMessageForLimit(fullMessage);
+			msgArray.forEach(msg => {
+				message.channel.send('```' + msg + '```');
+			});
 
-			return message.channel.send( getSortedMembersList(membersByRoleId, guildRoles) );
+			return;
 		}
 	},
 };
