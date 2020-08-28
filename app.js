@@ -144,3 +144,16 @@ client.on('shardError', error => {
 
 client.login(token);
 
+
+/**
+ * This is used only for hosting on Dreamhost so that a public URL can be hit
+ * to determine if the bot is running *and* because Dreamhost uses Passenger
+ * which needs to have a live page hit in order to fire up the node app.
+ */
+const http = require("http");
+
+http.createServer(function(request, response) {
+  response.writeHead(200, {"Content-Type": "text/plain"});
+  response.write("shoebot running");
+  response.end();
+}).listen(8888);
