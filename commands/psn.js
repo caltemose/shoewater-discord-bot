@@ -1,6 +1,6 @@
-// const { getUsers } = require('../importer.js');
+const { getUsers } = require('../modules/importer');
 const { ADMINISTRATOR } = require('../helpers/constants');
-const { logger, getISOStamp, getNameFromMessage } = require('../helpers/utils');
+const { logger, getISOStamp, getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
 
 const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {
@@ -73,11 +73,11 @@ module.exports = {
 			}
 		}
 
-		if (!Object.keys(guildPsn).length) {
+		if (!Object.keys(guildPsn).length && subcommand !== 'import') {
 			// if the guildPsn has no data yet these are the only allowed commands
 			const allowed = [ 'set', 'setsame' ];
 			if (!subcommand || !allowed.includes(subcommand.toLowerCase())) {
-				logger(`'${getNameFromMessage(message)}' tried to set a psn but a psn list was not found.`, getISOStamp());
+				logger(`'${getNameFromMessage(message)}' tried to show the psn list but one was was not found.`, getISOStamp());
 				return message.channel.send('No PSN list found. Try using the `psn set` command');
 			}
 			else {
@@ -98,16 +98,53 @@ module.exports = {
 				return await setMemberPsn(same);
 			}
 		}
+		else if (subcommand === 'import') {
+			const guildFiles = {
+				'743109978440728646': 'test-discord-psn.txt', // test
+				'729480893256827012': 'discord-psn-list.txt', // smug
+			}
+
+			const filepath = guildFiles[guildId];
+			const users = getUsers(filepath);
+
+			const usersNotFound = [];
+
+			users.forEach(user => {
+				// find the user's id from guildMembers
+				const member = getGuildMemberByDisplayName(guildMembers, user.displayName);
+				if (!member) usersNotFound.push(user);
+				else guildPsn[member.id] = user.psn;
+			});
+			
+			allPsn[guildId] = guildPsn;
+			let msg = `Users read from ${filepath}\n`;
+			if (usersNotFound.length) {
+				msg += 'These users could not be found\n```';
+				usersNotFound.forEach(user => {
+					msg += user.displayName + ', ';
+				});
+				msg += '```';
+			}
+			await keyv.set('psn', allPsn);
+			return message.channel.send(msg);
+		}
 		else {
 			if (!subcommand) {
-				let msg = '```**Members with set PSNs**\n';
+				let msg = '**Members with set PSNs**\n';
 				msg += 'Discord => PSN\n';
+				
 				for(const memberId in guildPsn) {
 					const setTo = guildPsn[memberId].same ? 'same as Discord' : guildPsn[memberId].psn;
 					msg += `${guildMembers[memberId].displayName} => ${setTo}\n`;
 				}
-				msg += '```';
-				return message.channel.send(msg);
+				msg += '';
+
+				const msgArray = splitMessageForLimit(msg);
+				msgArray.forEach(msg => {
+					message.channel.send('```' + msg + '```');
+				});
+				
+				return;
 			} 
 			else {
 				if (subcommand.toLowerCase() === 'set') {
@@ -125,7 +162,7 @@ module.exports = {
 					return await setMemberPsn(true);
 				}
 				else if (subcommand.toLowerCase() === 'all') {
-					let msg = '```**All Members and their PSNs**\n';
+					let msg = '**All Members and their PSNs**\n';
 					msg += 'Discord => PS\n';
 
 					for(const memberId in guildMembers) {
@@ -137,8 +174,12 @@ module.exports = {
 						msg += guildMembers[memberId].displayName + ' => ' + `${memberPsn}\n`;
 					}
 
-					msg += '```';
-					return message.channel.send(msg);
+					const msgArray = splitMessageForLimit(msg);
+					msgArray.forEach(msg => {
+						message.channel.send('```' + msg + '```');
+					});
+
+					return;
 				}
 				else if (subcommand.toLowerCase() === 'unset') {
 					let msg = '```**Members who have not set their PSN**\n';
@@ -156,30 +197,6 @@ module.exports = {
 					await keyv.set('psn', allPsn);
 					logger(`'${getNameFromMessage(message)}' used 'psn clear' and deleted the guild's psn list.`, getISOStamp());
 					return message.channel.send('The Discord->PSN list for this guild was deleted.');
-				}
-				else if (subcommand.toLowerCase() === 'import') {
-					/*
-					// TODO rewrite
-					const filepath = args[1] || '../discord-psn-list.txt';
-					const users = getUsers(filepath);
-					console.log('users.length', users.length);
-					if (!psn) psn = {};
-
-					const memberUsernames = [];
-					members.forEach(member => {
-						memberUsernames.push(member.username);
-					});
-
-					users.forEach(user => {
-						if (memberUsernames.includes(user.discord)) {
-							psn[user.discord] = user.psn;
-						}
-					});
-					
-					await keyv.set('psn', psn);
-					message.channel.send(`Users read from ${filepath}`);
-					*/
-					return message.channel.send('import command is not functional yet');
 				}
 				else {
 					return message.channel.send('subcommand not recognized.');
