@@ -51,7 +51,6 @@ $mypsn setsame
 
 /////// helpers
 xGrimReaper_TM
-Adam_j_vine
 Mrs__Deadvolt
 
 

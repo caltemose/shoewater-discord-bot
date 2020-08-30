@@ -1,3 +1,9 @@
+/**
+ * This script is used manually from the terminal to backup the main
+ * keyv.json file. It is mostly for testing since the keyv.json file
+ * can be backed up from Discord using the command `data backup`
+ */
+
 const backupKeyv = require('./modules/backupKeyv');
 
 const goBackupKeyv = async () => {

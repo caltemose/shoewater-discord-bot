@@ -4,9 +4,7 @@ module.exports = {
 	},
 
 	getNameFromMessage: message => message.member.nickname || message.author.username,
-
-	// this doesn't avoid the character limit if a single line is greater than 
-	// the character limit. limit is currently 2000 so failure is unlikely.
+	
 	splitMessageForLimit: message => {
 		const limit = 2000 - 6;
 		const msgSplit = message.split('\n');

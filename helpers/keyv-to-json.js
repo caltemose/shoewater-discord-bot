@@ -18,8 +18,6 @@ const keyv = new Keyv({
 keyv.on('error', err => logger.error('Connection Error', err));
 
 const init = async () => {
-	const DIV = '============================================================';
-	
 	const data = {};
 
 	const roles = await keyv.get('roles');
