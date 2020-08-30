@@ -1,6 +1,6 @@
-const { ADMINISTRATOR } = require('../helpers/constants');
+const { ADMINISTRATOR } = require('../modules/constants');
 const logger = require('../modules/logger');
-const { getNameFromMessage } = require('../helpers/utils');
+const { getNameFromMessage } = require('../modules/utils');
 const ignoredRoles = [ '@everyone', 'shoewater bot' ];
 
 const getRolesString = (roles) => {

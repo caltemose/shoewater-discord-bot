@@ -1,5 +1,5 @@
 const logger = require('../modules/logger');
-const { getNameFromMessage } = require('../helpers/utils');
+const { getNameFromMessage } = require('../modules/utils');
 
 const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {

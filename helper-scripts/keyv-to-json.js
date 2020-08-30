@@ -37,7 +37,7 @@ const init = async () => {
 	const filepath = './backups/keyv-json.' + getFileDateStamp.forNow() + '.json';
 	fs.writeFile(filepath, JSON.stringify(data, null, 2), (err) => {
 		if (err) logger.error(err);
-		else logger.log(`Success writing file: ${filepath}`);
+		else logger.info(`Success writing file: ${filepath}`);
 	});
 
 };

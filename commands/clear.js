@@ -1,5 +1,5 @@
-const { ADMINISTRATOR } = require('../helpers/constants');
-const { getNameFromMessage } = require('../helpers/utils');
+const { ADMINISTRATOR } = require('../modules/constants');
+const { getNameFromMessage } = require('../modules/utils');
 const logger = require('../modules/logger');
 
 module.exports = {

@@ -4,7 +4,7 @@
  * can be backed up from Discord using the command `data backup`
  */
 
-const backupKeyv = require('./modules/backupKeyv');
+const backupKeyv = require('../modules/backupKeyv');
 
 const goBackupKeyv = async () => {
 	try {

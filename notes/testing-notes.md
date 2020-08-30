@@ -11,7 +11,6 @@ $help, $help all, $help [command]
 $members
 - non-admin fails
 - admin succeeds
-- ISSUE: markdown/underscores
 
 $user
 - non-admin fails

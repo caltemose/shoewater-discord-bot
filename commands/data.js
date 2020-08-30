@@ -1,7 +1,7 @@
-const { ADMINISTRATOR } = require('../helpers/constants');
+const { ADMINISTRATOR } = require('../modules/constants');
 const backupKeyv = require('../modules/backupKeyv');
 const logger = require('../modules/logger');
-const { getNameFromMessage } = require('../helpers/utils');
+const { getNameFromMessage } = require('../modules/utils');
 
 module.exports = {
 	name: 'data',
@@ -25,7 +25,7 @@ module.exports = {
 		if (subcommand === 'backup') {
 			try {
 				await backupKeyv('../keyv.json', '../backups');
-				logger.log('keyv file has been backed up.');
+				logger.info('keyv file has been backed up.');
 				return message.channel.send('Data has been backed up.');
 			} catch (err) {
 				logger.warn('! keyv WAS NOT backed up.', err);

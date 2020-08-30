@@ -1,7 +1,7 @@
 const { getUsers } = require('../modules/importer');
-const { ADMINISTRATOR } = require('../helpers/constants');
+const { ADMINISTRATOR } = require('../modules/constants');
 const logger = require('../modules/logger');
-const { getNameFromMessage, splitMessageForLimit } = require('../helpers/utils');
+const { getNameFromMessage, splitMessageForLimit } = require('../modules/utils');
 
 const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {
