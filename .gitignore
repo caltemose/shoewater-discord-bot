@@ -1,3 +1,5 @@
+.htaccess
+public/
 .DS_Store
 secure-notes.md
 config.json
