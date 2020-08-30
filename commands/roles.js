@@ -44,7 +44,7 @@ module.exports = {
 						if (!ignoredRoles.includes(role.name)) {
 							rolesStore[guildId][role.id] = role.name;
 						}
-					})
+					});
 				const rolesWereSet = await keyv.set('roles', rolesStore);
 				let response;
 				if (rolesWereSet) response = getRolesString(rolesStore[guildId]);
@@ -54,6 +54,6 @@ module.exports = {
 				}
 				return message.channel.send(response);
 			})
-			.catch(logger.error)
+			.catch(logger.error);
 	},
 };

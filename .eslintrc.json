@@ -1,0 +1,41 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2020": true
+    },
+    "plugins": [
+      "node",
+      "security"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:node/recommended",
+      "plugin:security/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2020
+    },
+    "ignorePatterns": [ "node_modules", "test.js", "keyv-structure-notes.js" ],
+    "rules": {
+        "indent": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "no-unused-vars": "off",
+        "node/no-unpublished-require": "off",
+        "security/detect-object-injection": "off"
+    }
+}

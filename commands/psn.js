@@ -72,26 +72,26 @@ module.exports = {
 				const setTo = same ? 'the same as their discord' : args[2];
 				return message.channel.send(`Set PSN of member ${args[1]} to ${setTo}.`);
 			}
-		}
+		};
 
 		if (!Object.keys(guildPsn).length && subcommand !== 'import') {
 			// if the guildPsn has no data yet these are the only allowed commands
 			const allowed = [ 'set', 'setsame' ];
 			if (!subcommand || !allowed.includes(subcommand.toLowerCase())) {
-				logger(`'${getNameFromMessage(message)}' tried to show the psn list but one was was not found.`, getISOStamp());
+				logger.warn(`'${getNameFromMessage(message)}' tried to show the psn list but one was was not found.`);
 				return message.channel.send('No PSN list found. Try using the `psn set` command');
 			}
 			else {
 				let same;
 				if (subcommand.toLowerCase() === 'set') {
 					if (!args[1] || !args[2]) {
-						logger(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (2) error.`, args[1], args[2], getISOStamp());
+						logger.warn(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (2) error.`, args[1], args[2]);
 						return message.channel.send('You must supply a valid Discord Name and PSN.');
 					}
 				}
 				else {
 					if (!args[1]) {
-						logger(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (1) error.`, args[1], getISOStamp());
+						logger.warn(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (1) error.`, args[1]);
 						return message.channel.send('You must supply a valid Discord Name.');
 					}
 					same = true;
@@ -103,7 +103,7 @@ module.exports = {
 			const guildFiles = {
 				'743109978440728646': 'test-discord-psn.txt', // test
 				'729480893256827012': 'discord-psn-list.txt', // smug
-			}
+			};
 
 			const filepath = guildFiles[guildId];
 			const users = getUsers(filepath);

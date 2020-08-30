@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint . --ext .js"
+  },
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=12.13.0"
+  },
   "dependencies": {
     "discord.js": "^12.2.0",
     "keyv": "^4.0.1",
@@ -14,6 +19,9 @@
   },
   "devDependencies": {
     "del": "^5.1.0",
+    "eslint": "^7.7.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-security": "^1.4.0",
     "uglify-js": "^3.10.2"
   }
 }

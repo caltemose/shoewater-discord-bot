@@ -14,6 +14,7 @@ const path = require('path');
 
 const keyv = new Keyv({
 	store: new KeyvFile({
+		// eslint-disable-next-line no-undef
 		filename: path.join(__dirname, 'keyv.json'),
 		writeDelay: 100,
 		encode: JSON.stringify,
@@ -35,6 +36,7 @@ const cooldowns = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
+	// eslint-disable-next-line security/detect-non-literal-require
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
@@ -91,7 +93,7 @@ client.on('message', async message => {
 	const command = client.commands.get(commandName);
 
 	if (command.args && !args.length) {
-		let reply = `You didn't provide any arguments.`;
+		let reply = 'You didn\'t provide any arguments.';
 		if (command.usage) {
 			reply += `\nThe proper usage is: \`${prefix}${command.name} ${command.usage}\``;
 		}
@@ -152,12 +154,13 @@ client.login(token);
  * which needs to have a live page hit in order to fire up the node app.
  * Note that the port in this case is overwritten by Passenger as port 80/443.
  */
+// eslint-disable-next-line no-undef
 if (process.env.NODE_ENV === 'production') {
-	const http = require("http");
+	const http = require('http');
 
 	http.createServer(function(request, response) {
-	response.writeHead(200, {"Content-Type": "text/plain"});
-	response.write("shoebot running");
-	response.end();
+		response.writeHead(200, {'Content-Type': 'text/plain'});
+		response.write('shoebot running');
+		response.end();
 	}).listen(8888);
 }

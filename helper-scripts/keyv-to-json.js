@@ -8,6 +8,7 @@ const KeyvFile = require('keyv-file').KeyvFile;
 
 const keyv = new Keyv({
 	store: new KeyvFile({
+		// eslint-disable-next-line no-undef
 		filename: path.join(__dirname, '../keyv.json'),
 		writeDelay: 100,
 		encode: JSON.stringify,

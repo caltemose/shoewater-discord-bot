@@ -9,7 +9,7 @@ const getCommandHelp = (command, prefix) => {
 	data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
 
 	if (command.usage) {
-		let msg = `**Usage:**\n`;
+		let msg = '**Usage:**\n';
 		command.usage.forEach(usage => {
 			if (usage.subcommand) {
 				msg += `\`${prefix}${command.name} ${usage.subcommand}\` `;

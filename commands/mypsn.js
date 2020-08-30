@@ -71,7 +71,7 @@ module.exports = {
 				msg = `Your PSN is: \`${myCurrentPsnObj.psn}\``;
 			}
 			else {
-				msg = `Something's wonky. Contact an admin please.`;
+				msg = 'Something\'s wonky. Contact an admin please.';
 			}
 			return message.channel.send(msg);
 		}

@@ -108,8 +108,8 @@ module.exports = {
 			}
 
 			if (rolesIssues) {
-				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command and received a rejection message.`, rejection);
-				return message.channel.send(rejection);
+				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command and received a rejection message.`, rolesIssues);
+				return message.channel.send(rolesIssues);
 			}
 
 			const guildMembers = allMembers[guildId];

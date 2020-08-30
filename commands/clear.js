@@ -16,14 +16,14 @@ module.exports = {
 
 		if (!deleteCount || deleteCount < 2 || deleteCount > 100) {
 			logger.warn(`'${getNameFromMessage(message)}' used 'clear' command with deleteCount of ${deleteCount}`);
-			return message.channel.send("Please provide a number between 2 and 100 for the number of messages to delete");
+			return message.channel.send('Please provide a number between 2 and 100 for the number of messages to delete');
 		}
 
 		const fetched = await message.channel.messages.fetch({limit: deleteCount});
 		message.channel
 			.bulkDelete(fetched)
 			.catch(error => {
-				logger.error(`bulkDelete error`, error);
+				logger.error('bulkDelete error', error);
 				message.reply(`Couldn't delete messages: ${error}`);
 			});
 	},
