@@ -1,13 +1,13 @@
 {
   "name": "shoewaters-discord-sandbox",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A private bot used to managed Discord guild member info.",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "lint": "eslint . --ext .js"
   },
-  "author": "",
+  "author": "Chad Altemose",
   "license": "ISC",
   "engines": {
     "node": ">=12.13.0"
