@@ -2,6 +2,7 @@ const { getUsers } = require('../modules/importer');
 const { ADMINISTRATOR } = require('../modules/constants');
 const logger = require('../modules/logger');
 const { getNameFromMessage, splitMessageForLimit } = require('../modules/utils');
+const dmAdmin = require('../modules/dmAdmin');
 
 const getGuildMemberByDisplayName = (members, displayName) => {
 	for (var i in members) {
@@ -135,8 +136,16 @@ module.exports = {
 				msg += 'Discord => PSN\n';
 				
 				for(const memberId in guildPsn) {
-					const setTo = guildPsn[memberId].same ? 'same as Discord' : guildPsn[memberId].psn;
-					msg += `${guildMembers[memberId].displayName} => ${setTo}\n`;
+					if (guildMembers[memberId]) {
+						const setTo = guildPsn[memberId].same ? 'same as Discord' : guildPsn[memberId].psn;
+						msg += `${guildMembers[memberId].displayName} => ${setTo}\n`;
+					}
+					else {
+						
+						const errorMsg = `MemberID in PSN not found in member list: ${memberId}`;
+						dmAdmin(errorMsg);
+						logger.warn(errorMsg);
+					}
 				}
 				msg += '';
 
