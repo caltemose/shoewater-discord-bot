@@ -38,7 +38,9 @@ module.exports = {
 		}
 
 		if (!allMembers || !guildMembers || !Object.keys(guildMembers).length) {
-			logger.warn(`'${getNameFromMessage(message)}' ran the 'psn' command without an existing member list.`);
+			const errMsg = `'${getNameFromMessage(message)}' ran the 'psn' command without an existing member list.`;
+			dmAdmin(errMsg);
+			logger.warn(errMsg);
 			return message.channel.send('No member list found. Run the `members` command first.');
 		}
 
@@ -61,7 +63,9 @@ module.exports = {
 		const setMemberPsn = async (same) => {
 			const foundUser = getGuildMemberByDisplayName(guildMembers, args[1]);
 			if (!foundUser) {
-				logger.warn(`'${getNameFromMessage(message)}' tried to set a member's psn but no member was found.`, args[1]);
+				const errMsg = `'${getNameFromMessage(message)}' tried to set a member's psn but no member was found.\n${args[1]}`;
+				dmAdmin(errMsg);
+				logger.warn(errMsg);
 				return message.channel.send(`No member with name ${args[1]} was found.`);
 			}
 			else {
@@ -79,7 +83,9 @@ module.exports = {
 			// if the guildPsn has no data yet these are the only allowed commands
 			const allowed = [ 'set', 'setsame' ];
 			if (!subcommand || !allowed.includes(subcommand.toLowerCase())) {
-				logger.warn(`'${getNameFromMessage(message)}' tried to show the psn list but one was was not found.`);
+				const errMsg = `'${getNameFromMessage(message)}' tried to show the psn list but one was was not found.`;
+				dmAdmin(errMsg);
+				logger.warn(errMsg);
 				return message.channel.send('No PSN list found. Try using the `psn set` command');
 			}
 			else {
@@ -205,7 +211,9 @@ module.exports = {
 				else if (subcommand.toLowerCase() === 'clear') {
 					allPsn[guildId] = {};
 					await keyv.set('psn', allPsn);
-					logger.info(`'${getNameFromMessage(message)}' used 'psn clear' and deleted the guild's psn list.`);
+					const msg = `'${getNameFromMessage(message)}' used 'psn clear' and deleted the guild's psn list.`;
+					dmAdmin(msg);
+					logger.info(msg);
 					return message.channel.send('The Discord->PSN list for this guild was deleted.');
 				}
 				else {

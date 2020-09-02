@@ -2,6 +2,7 @@ const { ADMINISTRATOR } = require('../modules/constants');
 const backupKeyv = require('../modules/backupKeyv');
 const logger = require('../modules/logger');
 const { getNameFromMessage } = require('../modules/utils');
+const dmAdmin = require('../modules/dmAdmin');
 
 module.exports = {
 	name: 'data',
@@ -28,8 +29,9 @@ module.exports = {
 				logger.info('keyv file has been backed up.');
 				return message.channel.send('Data has been backed up.');
 			} catch (err) {
+				dmAdmin('! keyv WAS NOT backed up. see error log.');				
 				logger.warn('! keyv WAS NOT backed up.', err);
-				return message.channel.send('Data WAS NOT backed up. contact @shoewater.');
+				return message.channel.send('Data WAS NOT backed up.');
 			}
 		}
 	},
