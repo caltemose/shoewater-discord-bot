@@ -130,6 +130,74 @@ client.on('message', async message => {
 
 });
 
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+	// if the member's nickname or username changed, update their data in the member list
+	if (oldMember.nickname !== newMember.nickname || oldMember.user.username !== newMember.user.username) {
+		const guildId = newMember.guild.id;
+		const allMembers = await keyv.get('members');
+		const guildMembers = allMembers[guildId];
+		
+		if (guildMembers && Object.keys(guildMembers).length) {
+			const userObj = {
+				id: newMember.id,
+				username: newMember.user.username,
+				nickname: newMember.nickname,
+				displayName: newMember.nickname || newMember.user.username,
+				roles: newMember._roles,
+			};			
+			guildMembers[newMember.id] = userObj;
+			allMembers[guildId] = guildMembers;
+		
+			const updated = await keyv.set('members', allMembers);
+
+			if (updated) logger.info(`Guild member '${userObj.displayName}' has been updated in the member list.`);
+			else logger.error(`Guild member '${userObj.displayName}' was not updated.`, updated);
+		}
+	}
+});
+
+client.on('guildMemberAdd', async newMember => {
+	const guildId = newMember.guild.id;
+	const allMembers = await keyv.get('members');
+	const guildMembers = allMembers[guildId];
+	
+	if (guildMembers) {
+		guildMembers[newMember.id] = {
+			id: newMember.id,
+			username: newMember.user.username,
+			nickname: newMember.nickname,
+			displayName: newMember.nickname || newMember.user.username,
+			roles: newMember._roles
+		};
+		const memberAdded = await keyv.set('members', allMembers);
+		if (memberAdded) logger.info(`Guild member '${newMember.user.username}' added to member list.`);
+		else logger.error(`Guild member '${newMember.user.username}' could not be added to member list.`);
+	}
+});
+
+client.on('guildMemberRemove', async oldMember => {
+	const guildId = oldMember.guild.id;
+	const allMembers = await keyv.get('members');
+	const guildMembers = allMembers[guildId];
+	
+	if (guildMembers && guildMembers[oldMember.id]) {
+		delete guildMembers[oldMember.id];
+		const memberDeleted = await keyv.set('members', allMembers);
+		if (memberDeleted) logger.info(`Guild member '${oldMember.user.username}' deleted from member list.`);
+		else logger.error(`Guild member '${oldMember.user.username}' could not be deleted from member list.`);
+	}
+
+	const allPsn = await keyv.get('psn');
+	const guildPsn = allPsn[guildId];
+
+	if (guildPsn && guildPsn[oldMember.id]) {
+		delete guildPsn[oldMember.id];
+		const psnDeleted = await keyv.set('psn', allPsn);
+		if (psnDeleted) logger.info(`Guild member '${oldMember.user.username}' deleted from psn list.`);
+		else logger.info(`Guild member '${oldMember.user.username}' could not be deleted from psn list.`);
+	}
+});
+
 client.on('shardError', error => {
 	logger.error('A websocket connection encountered an error:', error);
 	/*

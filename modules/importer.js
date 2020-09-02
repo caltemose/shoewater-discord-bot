@@ -11,11 +11,11 @@ const getLineObject = line => {
 	remainder = remainder.trimStart();
 	
 	if (remainder.trimEnd().toLowerCase() === 'same') {
-		user.displayName = psnString;
+		user.displayName = user.psn.displayName = psnString;
 		user.psn.same = true;
 	}
 	else {
-		user.displayName = remainder;
+		user.displayName = user.psn.displayName = remainder;
 		user.psn.psn = psnString;
 	}
 	return user;

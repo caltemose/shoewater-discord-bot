@@ -69,8 +69,8 @@ module.exports = {
 				return message.channel.send(`No member with name ${args[1]} was found.`);
 			}
 			else {
-				if (same) guildPsn[foundUser.id] = { same: true };
-				else guildPsn[foundUser.id] = { psn: args[2] };
+				if (same) guildPsn[foundUser.id] = { same: true, displayName: args[1] };
+				else guildPsn[foundUser.id] = { psn: args[2], displayName: args[1] };
 
 				allPsn[guildId] = guildPsn;
 				await keyv.set('psn', allPsn);
@@ -108,8 +108,8 @@ module.exports = {
 		}
 		else if (subcommand === 'import') {
 			const guildFiles = {
-				'743109978440728646': 'test-discord-psn.txt', // test
-				'729480893256827012': 'discord-psn-list.txt', // smug
+				'743109978440728646': 'discord-psn-lists/shoe-sandbox.txt', // test
+				'729480893256827012': 'discord-psn-lists/smug.txt', // smug
 			};
 
 			const filepath = guildFiles[guildId];
@@ -148,7 +148,7 @@ module.exports = {
 					}
 					else {
 						
-						const errorMsg = `MemberID in PSN not found in member list: ${memberId}`;
+						const errorMsg = `MemberId in PSN not found in member list: ${memberId}`;
 						dmAdmin(errorMsg);
 						logger.warn(errorMsg);
 					}

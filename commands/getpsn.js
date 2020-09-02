@@ -54,7 +54,10 @@ module.exports = {
 		else {
 			const memberName = arg.trim();
 			member = getGuildMemberByDisplayName(guildMembers, memberName);
-			memberPsn = guildPsn[member.id];
+			if (member) memberPsn = guildPsn[member.id];
+			else {
+				return message.channel.send(`Could not find the member '${memberName}' in the member list. Did you spell the user's name correctly?`);
+			}
 		}
 		if (member) {
 			let msg;
