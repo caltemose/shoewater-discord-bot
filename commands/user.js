@@ -5,7 +5,6 @@ const { getNameFromMessage } = require('../modules/utils');
 module.exports = {
 	name: 'user',
 	description: 'Get user info by ID',
-	cooldown: 3,
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
 			logger.warn(`'${getNameFromMessage(message)}' used the 'user' command without permission.`);

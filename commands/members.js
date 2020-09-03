@@ -42,6 +42,7 @@ module.exports = {
 	usage: [
 		{ text: 'Lists the members of this Discord guild, sorted by roles. Requires the roles to be stored in memory ahead of time.' },
 		{ subcommand: 'update', text: 'Rebuilds the members list for this guild.' },
+		{ subcommand: 'clear', text: 'Clears the member list for this guild. Development use only - use `update` instead.' }
 	],
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
