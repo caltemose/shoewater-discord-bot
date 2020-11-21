@@ -10,7 +10,7 @@ module.exports = {
 		const msgSplit = message.split('\n');
 		const finalArray =  [];
 		let indx = 0;
-		for(let i = 0; i < msgSplit.length - 1; i++) {
+		for(let i = 0; i < msgSplit.length; i++) {
 			if (!finalArray[indx]) {
 				finalArray[indx] = '';
 			}

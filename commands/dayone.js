@@ -14,10 +14,16 @@ module.exports = {
 		}
 		const subcommand = args.shift();
 		if (subcommand === 'join') {
-			logger.info(`$dayone join from ${myDiscordId}`);
-			raidDayOne.push(myDiscordId);
-			await keyv.set('raidDayOne', raidDayOne);
-			return message.channel.send(myDiscordId + ' wants to join the raid.');
+			if (raidDayOne.includes(myDiscordId)) {
+				logger.info(`${myDiscordId} tried to join but has already done so.`);
+				return message.channel.send(`You've already joined. No need to join again ${myDiscordId}`);
+			}
+			else {
+				logger.info(`$dayone join from ${myDiscordId}`);
+				raidDayOne.push(myDiscordId);
+				await keyv.set('raidDayOne', raidDayOne);
+				return message.channel.send(myDiscordId + ' wants to join the raid.');
+			}
 		}
 		else if (subcommand === 'remove') {
 			const found = raidDayOne.indexOf(myDiscordId);

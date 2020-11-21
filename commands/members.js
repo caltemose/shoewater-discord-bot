@@ -91,6 +91,27 @@ module.exports = {
 				return message.channel.send('members list for this guild has been cleared.');
 			}
 		}
+		else if (subcommand === 'json') {
+			return;
+			// const guildMembers = allMembers[guildId];
+			// if (!guildMembers || guildMembers.length < 1) {
+			// 	logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command without a members list.`);
+			// 	return message.channel.send('There is no member list. Run the `members update` command first.');
+			// }
+			// var memberNameList = [];
+			// for(const memberId in guildMembers) {
+			// 	const member = guildMembers[memberId];
+			// 	memberNameList.push(member.displayName);
+			// }
+			// const fullMessage = JSON.stringify(memberNameList);			
+			// const msgArray = splitMessageForLimit(fullMessage);
+			// msgArray.forEach(msg => {
+			// 	message.channel.send('```' + msg + '```');
+			// });
+			// logger.info(memberNameList);
+			// return;
+
+		}
 		else if (!subcommand) {
 			let rolesIssues;
 
