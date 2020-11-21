@@ -23,6 +23,7 @@ const getLineObject = line => {
 
 module.exports = {
 	getUsers: filepath => {
+		// eslint-disable-next-line security/detect-non-literal-fs-filename
 		const file = fs.readFileSync(filepath, 'utf8');
 		const split = file.split('\n');
 		const end = split[split.length-1];
