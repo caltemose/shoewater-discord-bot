@@ -36,6 +36,7 @@ const init = async () => {
 		data.psn = psn;
 	}
 	const filepath = './backups/keyv-json.' + getFileDateStamp.forNow() + '.json';
+	// eslint-disable-next-line security/detect-non-literal-fs-filename
 	fs.writeFile(filepath, JSON.stringify(data, null, 2), (err) => {
 		if (err) logger.error(err);
 		else logger.info(`Success writing file: ${filepath}`);
