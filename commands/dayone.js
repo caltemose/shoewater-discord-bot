@@ -6,7 +6,6 @@ module.exports = {
 	description: 'Day One Raid commands',
 	cooldown: 1,
 	execute: async (message, args, keyv, prefix, guildId) => {
-		logger.info(`shoewater bot version ${VERSION}`);
 		var raidDayOne = await keyv.get('raidDayOne');
 		const myDiscordId = message.member.nickname || message.author.username;
 		if (!raidDayOne) {

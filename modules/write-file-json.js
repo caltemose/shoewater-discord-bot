@@ -10,7 +10,6 @@ module.exports = async (data, filePath) => {
 
 	// eslint-disable-next-line security/detect-non-literal-fs-filename
 	const results = await writeFileAsync(dest, fileData);
-	console.log(results);
 	return results;
 	// fs.writeFile(path, JSON.stringify(data, null, 2), err => {
 	// 	if (err) {

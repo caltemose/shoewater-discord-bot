@@ -1,5 +1,6 @@
 const { createLogger, format, transports } = require('winston');
 const path = require('path');
+const { VERSION } = require('./constants');
 
 // eslint-disable-next-line no-undef
 const errorFile = path.join(__dirname, '../logs/errors.log');
@@ -16,7 +17,7 @@ const logger = createLogger({
 		format.splat(),
 		format.json(),
 	),
-	defaultMeta: { service: 'shoebot-logger' },
+	defaultMeta: { service: `shoebot-logger ${VERSION}` },
 	transports: [
 		new transports.File({ filename: errorFile, level: 'error' }),
 		new transports.File({ filename: infoFile, level: 'info' }),
