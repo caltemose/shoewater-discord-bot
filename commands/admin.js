@@ -1,24 +1,18 @@
 const compareTwoStrings = require('string-similarity').compareTwoStrings;
-const { ADMINISTRATOR } = require('../modules/constants');
+
 const { getNameFromMessage } = require('../modules/utils');
 const logger = require('../modules/logger');
 const writeFileJson = require('../modules/write-file-json');
-const { bungieApiKey } = require('../config.json');
 const getClanMembers = require('../modules/bungieGetClanMembers');
+
+const { bungieApiKey } = require('../config.json');
+const { ADMINISTRATOR } = require('../modules/constants');
+
+// TODO replace these ids with proper usage of keyv and message data
 // const clanRole = '730995497258450984'; // smug guild
 // const clanRole = '743126625914191974'; // test guild
 const testGuildId = '743109978440728646';
 // const smugGuildId = '729480893256827012';
-
-
-const getMembersOptions = {
-	hostname: 'www.bungie.net',
-	path: '/Platform/GroupV2/877521/Members',
-	headers: {
-		'X-API-KEY': bungieApiKey,
-	},
-	method: 'GET',
-};
 
 const isInBungieClan = (discordName, clanList) => {
 	let inClan = false;
@@ -66,18 +60,18 @@ module.exports = {
 	cooldown: 5,
 	execute: async (message, args, keyv, prefix, guildId) => {
 		if (!message.member.hasPermission(ADMINISTRATOR)) {
-			logger.warn(`'${getNameFromMessage(message)}' tried to access the 'clear' command`);
-			return message.channel.send('You do not have permissions to use the `clear` command.');
+			logger.warn(`'${getNameFromMessage(message)}' tried to access admin commands`);
+			return message.channel.send('You do not have permissions to use the `admin` commands.');
 		}
 
-		// "743109978440728646": {
+		// "743109978440728646": { Test Guild
 		// 	"743126625914191974": "Clan Members",
 		// 	"743126925907853353": "Mod Admins",
 		// 	"743127184721313843": "Dredgens",
 		// 	"743464591434055824": "Admins",
 		// 	"743464640998015036": "Founder"
 		//   },
-		//   "729480893256827012": {
+		//   "729480893256827012": { SMUG Guild
 		// 	"729481197872349235": "Charlemagne",
 		// 	"729629552850239549": "Friend Time",
 		// 	"729640707282960395": "Servant of Niris",
@@ -91,13 +85,14 @@ module.exports = {
 		// 	"747812213129216010": "tester"
 		//   }
 
+		// TODO update to refer to stored data instead of coded strings
 		const clanRole = guildId === testGuildId ? '743126625914191974' : '730995497258450984';
 
 		const subcommand = args[0];
 		let results;
 
 		if (subcommand === 'member-report') {
-			// get bungie clan list
+			// get bungie clan list which returns array of { bungieId, displayName }
 			try {
 				results = await getClanMembers();
 				if (results.err) {
@@ -108,9 +103,7 @@ module.exports = {
 				return message.channel.send('Bungie API call failed:\n' + err.toString());
 			}
 
-			// return message.channel.send(`Number of members retrieved from Bungie: ${results.members.length}`);
 			const bungieMembers = results.members;
-			// console.log('bungieMembers', bungieMembers);
 
 			// get members list
 			var allMembers = await keyv.get('members');
@@ -122,21 +115,6 @@ module.exports = {
 				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command without a members list.`);
 				return message.channel.send('There is no member list. Run the `members update` command first.');
 			}
-
-			// bungieMembers is array of { bungieId, displayName }
-			// guildMembers is array of 
-			//   id: user.user.id,
-			//   username: user.user.username,
-			//   nickname: user.nickname,
-			//   displayName: user.nickname || user.user.username,
-			//   roles: user._roles,
-
-			// Roles "729480893256827012": {
-			// 	"729741454234091551": "Admins",
-			// 	"730995497258450984": "Clan Members",
-			// 	"731188520894333049": "Mod Admins",
-			// 	"732396153852788836": "Dredgens",
-			// 	"742135441318477925": "Founder",
 
 			const reportData = {
 				notInClan: {
@@ -150,8 +128,8 @@ module.exports = {
 				notInDiscord: [],
 			};
 
-			const guildMemberKeys = Object.keys(guildMembers);
 			console.log('1. checking guild members against bungie clan');
+			const guildMemberKeys = Object.keys(guildMembers);
 			guildMemberKeys.forEach(key => {
 				const member = guildMembers[key];
 				if (isInBungieClan(member.displayName, bungieMembers)) {
@@ -189,36 +167,6 @@ module.exports = {
 			await message.channel.send(`**Discord users who need 'dredgen' role changed to 'clan':**\n${reportData.inClan.noClanRole.join(', ')}\n`);
 
 			return message.channel.send(`**Discord users who need 'clan' role changed to 'dredgen':**\n${reportData.notInClan.hasClanRole.join(', ')}\n`);
-			
-			// test of writing json file
-			//
-			// const filePath = '../backups/test.json';
-
-			// await writeFileJson({'something':'else'}, filePath)
-			// 	.catch(err => {
-			// 		console.log(err);
-			// 		return message.channel.send('There was an error saving the clan file.');
-			// 	});
-
-			// return message.channel.send(`The file was written to:\n${filePath}`);
-
-			
-
-			/*
-			1. get clan list from API
-			2. update discord member list
-			3. get discord member list
-			4. make comparisons
-				a. sort discord members into: 
-					1. not in clan
-						a. with 'not in clan' role
-						b. without 'not in clan' role
-					2. in clan
-						a. with 'not in clan' role
-						b. without 'not in clan' role
-				b. get clan members not in discord
-			5. report above
-			*/
 		}
 		else if (subcommand === 'write-clan') {
 			try {
@@ -230,10 +178,10 @@ module.exports = {
 			catch (err) {
 				return message.channel.send('Bungie API call failed:\n' + err.toString());
 			}
-
-			// return message.channel.send(`Number of members retrieved from Bungie: ${results.members.length}`);
+			
 			const bungieMembers = results.members;
 
+			// TODO change clan-list file path to include timestamp and guildId (? or use DB)
 			const filePath = '../backups/clan-list.json';
 			await writeFileJson(bungieMembers, filePath)
 				.catch(err => {
