@@ -31,7 +31,7 @@ const namesAreSimilar = (name1, name2) => {
 	const limit = 0.5;
 	const comparison = compareTwoStrings(name1, name2) > limit;
 	if (name1 !== name2 && comparison > limit) {
-		console.log(limit, '!= but close: ', name1, name2);
+		// console.log(limit, '!= but close: ', name1, name2);
 		return true;
 	}
 
@@ -160,13 +160,13 @@ module.exports = {
 					return message.channel.send(`There was an error writing the report file to:\n${filePath}`);
 				});
 			
-			await message.channel.send(`The member report was written to:\n${filePath}\n`);
+			console.log(`The member report was written to:\n${filePath}\n`);
 			
-			await message.channel.send(`**Clan members not in Discord:**\n${reportData.notInDiscord.join(', ')}\n`);
+			await message.channel.send(`**Clan members not in Discord:**\n${reportData.notInDiscord.join(', ')}\n\n`);
 
-			await message.channel.send(`**Discord users who need 'dredgen' role changed to 'clan':**\n${reportData.inClan.noClanRole.join(', ')}\n`);
+			await message.channel.send(`**Discord users who need \`dredgen\` role changed to \`clan\`:**\n${reportData.inClan.noClanRole.join(', ')}\n\n`);
 
-			return message.channel.send(`**Discord users who need 'clan' role changed to 'dredgen':**\n${reportData.notInClan.hasClanRole.join(', ')}\n`);
+			return message.channel.send(`**Discord users who need \`clan\` role changed to \`dredgen\`:**\n${reportData.notInClan.hasClanRole.join(', ')}\n\n`);
 		}
 		else if (subcommand === 'write-clan') {
 			try {
