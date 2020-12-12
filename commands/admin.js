@@ -14,10 +14,15 @@ const { ADMINISTRATOR } = require('../modules/constants');
 const testGuildId = '743109978440728646';
 // const smugGuildId = '729480893256827012';
 
-const isInBungieClan = (discordName, clanList) => {
+const isInBungieClan = (discordName, clanList, memberPsn) => {
 	let inClan = false;
 	clanList.forEach(clanMember =>{
-		if (namesAreSimilar(clanMember.displayName, discordName)) {
+		/*
+		instead of comparing clanMember.displayName (PSN) to discordName,
+		compare it to discord member's PSN if it's available. if not then keep same.
+		*/
+		const nameToCompare = memberPsn && memberPsn.psn ? memberPsn.psn : discordName;
+		if (namesAreSimilar(clanMember.displayName, nameToCompare)) {
 			inClan = true;
 		}
 	});
@@ -27,10 +32,9 @@ const isInBungieClan = (discordName, clanList) => {
 const namesAreSimilar = (name1, name2) => {
 	// this could be refactored to be shorter but is left
 	// this way for logging to play around with string-similarity results
-	if (name1 === name2) return true;
+	if (name1.toLowerCase() === name2.toLowerCase()) return true;
 	const limit = 0.5;
-	const comparison = compareTwoStrings(name1, name2) > limit;
-	if (name1 !== name2 && comparison > limit) {
+	if (compareTwoStrings(name1, name2) > limit) {
 		// console.log(limit, '!= but close: ', name1, name2);
 		return true;
 	}
@@ -38,14 +42,16 @@ const namesAreSimilar = (name1, name2) => {
 	return false;
 };
 
-const isInDiscord = (bungieName, guildMembers) => {
+const isInDiscord = (bungieName, guildMembers, guildPsn) => {
 	let inDiscord = false;
 	const guildMemberKeys = Object.keys(guildMembers);
 	guildMemberKeys.forEach(key => {
 		const guildMember = guildMembers[key];
-		if (namesAreSimilar(guildMember.displayName, bungieName)) {
+		const nameToCompare = guildPsn[key] && guildPsn[key].psn ? guildPsn[key].psn : guildMember.displayName;
+		if (namesAreSimilar(nameToCompare, bungieName)) {
 			inDiscord = true;
 		}
+
 	});
 	return inDiscord;
 };
@@ -91,7 +97,7 @@ module.exports = {
 		const subcommand = args[0];
 		let results;
 
-		if (subcommand === 'member-report') {
+		if (subcommand === 'prune') {
 			// get bungie clan list which returns array of { bungieId, displayName }
 			try {
 				results = await getClanMembers();
@@ -115,6 +121,8 @@ module.exports = {
 				logger.warn(`'${getNameFromMessage(message)}' ran the 'members' command without a members list.`);
 				return message.channel.send('There is no member list. Run the `members update` command first.');
 			}
+			const allPsn = await keyv.get('psn');
+			const guildPsn = allPsn && allPsn[guildId] ? allPsn[guildId] : null;
 
 			const reportData = {
 				notInClan: {
@@ -132,7 +140,7 @@ module.exports = {
 			const guildMemberKeys = Object.keys(guildMembers);
 			guildMemberKeys.forEach(key => {
 				const member = guildMembers[key];
-				if (isInBungieClan(member.displayName, bungieMembers)) {
+				if (isInBungieClan(member.displayName, bungieMembers, guildPsn[key])) {
 					if (hasClanRole(member, clanRole)) {
 						reportData.inClan.hasClanRole.push(member.displayName);
 					}
@@ -148,7 +156,7 @@ module.exports = {
 
 			console.log('2. checking clan members against discord guild');
 			bungieMembers.forEach(bungieMember => {
-				if (!isInDiscord(bungieMember.displayName, guildMembers)) {
+				if (!isInDiscord(bungieMember.displayName, guildMembers, guildPsn)) {
 					reportData.notInDiscord.push(bungieMember.displayName);
 				}
 			});
@@ -190,6 +198,9 @@ module.exports = {
 				});
 			
 			return message.channel.send(`The clan list was written to:\n${filePath}`);
+		}
+		else if (subcommand === 'test') {
+			return message.channel.send(compareTwoStrings('GladiatorBeaver', 'GladitorBeaver') > 0.5);
 		}
 	}
 };

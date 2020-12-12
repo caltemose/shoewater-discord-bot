@@ -147,10 +147,12 @@ module.exports = {
 						msg += `${guildMembers[memberId].displayName} => ${setTo}\n`;
 					}
 					else {
-						
-						const errorMsg = `MemberId in PSN not found in member list: ${memberId}`;
-						dmAdmin(errorMsg);
-						logger.warn(errorMsg);
+						let errorMsg = 'MemberId in PSN not found in member list:\n';
+						for(var i in guildPsn[memberId]) {
+							errorMsg += `  ${guildPsn[memberId][i]}\n`;
+						}
+						delete guildPsn[memberId];
+						console.log(errorMsg);
 					}
 				}
 				msg += '';
@@ -159,11 +161,15 @@ module.exports = {
 				msgArray.forEach(msg => {
 					message.channel.send('```' + msg + '```');
 				});
+
+				allPsn[guildId] = guildPsn;
+				await keyv.set('psn', allPsn);
 				
 				return;
 			} 
 			else {
 				if (subcommand.toLowerCase() === 'set') {
+					console.log(args[1]);
 					if (!args[1] || !args[2]) {
 						logger.warn(`'${getNameFromMessage(message)}' used 'psn set' and received a bad arguments (2) error.`, args[1], args[2]);
 						return message.channel.send('You must supply a valid Discord Name and PSN.');
@@ -215,6 +221,18 @@ module.exports = {
 					dmAdmin(msg);
 					logger.info(msg);
 					return message.channel.send('The Discord->PSN list for this guild was deleted.');
+				}
+				else if (subcommand.toLowerCase() === 'prune') {
+					// go through psn array and remove anyone not in discord
+					let deleteCount = 0;
+					for(const memberId in guildPsn) {
+						if (!guildMembers[memberId]) {
+							console.log(guildPsn[memberId]);
+							deleteCount++;
+							delete guildPsn[memberId];
+						}
+					}
+					return message.channel.send(`${deleteCount} members removed from PSN list.`);
 				}
 				else {
 					return message.channel.send('subcommand not recognized.');
