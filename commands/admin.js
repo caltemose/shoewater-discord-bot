@@ -199,8 +199,8 @@ module.exports = {
 			
 			return message.channel.send(`The clan list was written to:\n${filePath}`);
 		}
-		else if (subcommand === 'test') {
-			return message.channel.send(compareTwoStrings('GladiatorBeaver', 'GladitorBeaver') > 0.5);
+		else if (subcommand === 'test') {			
+			return message.channel.send(args.join('\n'));
 		}
 	}
 };

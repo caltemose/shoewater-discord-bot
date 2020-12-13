@@ -42,6 +42,52 @@ for (const file of commandFiles) {
 }
 
 //
+// argument parsing helper
+//
+
+/*
+This function takes the command argument string and returns
+and array of arguments. In addition to the happy path cases,
+this function handles an argument surrounded by single quotes
+in order to pass arguments with spaces (which is usually 
+considered an argument delimeter).
+
+This function is not bullet-proof and has not been tested with
+multiple arguments bound by single quotes. If will fail if 
+single quotes are used as delimiter and as a legit part of
+an argument such as:
+$psn set 'My Dis'cord Name with Spaces' myPSN
+*/
+const parseArgs = (argsString, prefix) => {
+	let a = argsString.slice(prefix.length).trim().split(/ +/);
+	let b = [];
+	let prev = null;
+	let start = false;
+	
+	a.forEach(str => {
+		if (str.indexOf('\'') > -1) {
+			if (!start) {
+				start = true;
+				prev = str.replace('\'', '');
+			} else {
+				start = false;
+				b.push(prev + ' ' + str.replace('\'', ''));
+				prev = null;
+			}
+		} else {
+			if (start) {
+				prev += ' ' + str;
+			} else {
+				b.push(str);
+			}
+		}
+	});
+
+	return b;
+};
+
+
+//
 // Discord event listeners
 //
 
@@ -84,7 +130,8 @@ client.on('message', async message => {
 
 
 	// get possible command and arguments from the message
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
+	const args = parseArgs(message.content, prefix);
+	//message.content.slice(prefix.length).trim().split(/ +/);
 	const commandName = args.shift().toLowerCase();
 
 	// ignore message if given command isn't recognized
@@ -102,7 +149,7 @@ client.on('message', async message => {
 
 	if (!cooldowns.has(command.name)) {
 		cooldowns.set(command.name, new Discord.Collection());
-	}
+	} // mrUnc0mm0nK0d#r
 
 	const now = Date.now();
 	const timestamps = cooldowns.get(command.name);
